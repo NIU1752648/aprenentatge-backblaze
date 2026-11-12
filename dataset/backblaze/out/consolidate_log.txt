@@ -1,0 +1,20 @@
+files 92 2025-10-01.csv -> 2025-12-31.csv
+smart raw columns in csv: 93
+  2025-10-01.csv rows 330866 (1s)
+  2025-10-11.csv rows 333076 (14s)
+  2025-10-21.csv rows 335505 (28s)
+  2025-10-31.csv rows 336883 (43s)
+  2025-11-10.csv rows 336401 (55s)
+  2025-11-20.csv rows 337399 (69s)
+  2025-11-30.csv rows 336986 (83s)
+  2025-12-10.csv rows 338006 (96s)
+  2025-12-20.csv rows 339330 (110s)
+  2025-12-30.csv rows 338863 (124s)
+rows 30941708; keep 63 SMART columns, drop 30 (>99.9% missing)
+panel saved data/panel/2025Q4.parquet 889 MB
+drives saved data/drives.parquet (341664, 14) failed 945
+censoring
+alive_at_end    338815
+left_data         1904
+failed             945
+total 199s

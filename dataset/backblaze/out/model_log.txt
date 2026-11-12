@@ -1,0 +1,109 @@
+7 0 logistic all roc 0.847 pr 0.0702 rec@1% 0.476
+7 0 logistic no_err roc 0.706 pr 0.0005 rec@1% 0.029
+7 0 knn50 all roc 0.874 pr 0.0349 rec@1% 0.476
+7 0 gaussNB all roc 0.875 pr 0.0045 rec@1% 0.243
+7 0 tree all roc 0.770 pr 0.0124 rec@1% 0.466
+7 0 rf all roc 0.915 pr 0.0499 rec@1% 0.583
+7 0 rf no_err roc 0.810 pr 0.0034 rec@1% 0.165
+7 0 svm_rbf all roc 0.799 pr 0.0200 rec@1% 0.515
+7 1 logistic all roc 0.872 pr 0.0688 rec@1% 0.416
+7 1 logistic no_err roc 0.721 pr 0.0022 rec@1% 0.071
+7 1 knn50 all roc 0.826 pr 0.0620 rec@1% 0.460
+7 1 gaussNB all roc 0.502 pr 0.0003 rec@1% 0.000
+7 1 tree all roc 0.747 pr 0.0149 rec@1% 0.442
+7 1 rf all roc 0.923 pr 0.0817 rec@1% 0.558
+7 1 rf no_err roc 0.768 pr 0.0110 rec@1% 0.212
+7 1 svm_rbf all roc 0.792 pr 0.0155 rec@1% 0.496
+7 2 logistic all roc 0.879 pr 0.0603 rec@1% 0.449
+7 2 logistic no_err roc 0.701 pr 0.0012 rec@1% 0.056
+7 2 knn50 all roc 0.854 pr 0.0504 rec@1% 0.505
+7 2 gaussNB all roc 0.864 pr 0.0046 rec@1% 0.243
+7 2 tree all roc 0.768 pr 0.0212 rec@1% 0.430
+7 2 rf all roc 0.921 pr 0.0522 rec@1% 0.570
+7 2 rf no_err roc 0.754 pr 0.0034 rec@1% 0.112
+7 2 svm_rbf all roc 0.799 pr 0.0147 rec@1% 0.505
+30 0 logistic all roc 0.878 pr 0.0897 rec@1% 0.374
+30 0 logistic no_err roc 0.692 pr 0.0052 rec@1% 0.082
+30 0 knn50 all roc 0.851 pr 0.0877 rec@1% 0.443
+30 0 gaussNB all roc 0.509 pr 0.0011 rec@1% 0.000
+30 0 tree all roc 0.770 pr 0.0415 rec@1% 0.412
+30 0 rf all roc 0.895 pr 0.0873 rec@1% 0.487
+30 0 rf no_err roc 0.752 pr 0.0096 rec@1% 0.141
+30 0 svm_rbf all roc 0.816 pr 0.0345 rec@1% 0.420
+30 1 logistic all roc 0.888 pr 0.0836 rec@1% 0.440
+30 1 logistic no_err roc 0.721 pr 0.0145 rec@1% 0.120
+30 1 knn50 all roc 0.858 pr 0.0767 rec@1% 0.489
+30 1 gaussNB all roc 0.841 pr 0.0177 rec@1% 0.058
+30 1 tree all roc 0.829 pr 0.0550 rec@1% 0.500
+30 1 rf all roc 0.899 pr 0.0912 rec@1% 0.543
+30 1 rf no_err roc 0.744 pr 0.0067 rec@1% 0.132
+30 1 svm_rbf all roc 0.871 pr 0.0440 rec@1% 0.476
+30 2 logistic all roc 0.826 pr 0.0721 rec@1% 0.429
+30 2 logistic no_err roc 0.676 pr 0.0055 rec@1% 0.123
+30 2 knn50 all roc 0.830 pr 0.0644 rec@1% 0.429
+30 2 gaussNB all roc 0.828 pr 0.0168 rec@1% 0.042
+30 2 tree all roc 0.802 pr 0.0359 rec@1% 0.360
+30 2 rf all roc 0.867 pr 0.0598 rec@1% 0.492
+30 2 rf no_err roc 0.719 pr 0.0074 rec@1% 0.121
+30 2 svm_rbf all roc 0.822 pr 0.0356 rec@1% 0.439
+60 0 logistic all roc 0.873 pr 0.1012 rec@1% 0.420
+60 0 logistic no_err roc 0.728 pr 0.0076 rec@1% 0.056
+60 0 knn50 all roc 0.850 pr 0.1018 rec@1% 0.420
+60 0 gaussNB all roc 0.507 pr 0.0017 rec@1% 0.000
+60 0 tree all roc 0.760 pr 0.0606 rec@1% 0.420
+60 0 rf all roc 0.883 pr 0.1238 rec@1% 0.489
+60 0 rf no_err roc 0.752 pr 0.0097 rec@1% 0.096
+60 0 svm_rbf all roc 0.798 pr 0.0573 rec@1% 0.434
+60 1 logistic all roc 0.869 pr 0.0883 rec@1% 0.366
+60 1 logistic no_err roc 0.716 pr 0.0053 rec@1% 0.058
+60 1 knn50 all roc 0.847 pr 0.0913 rec@1% 0.443
+60 1 gaussNB all roc 0.832 pr 0.0213 rec@1% 0.037
+60 1 tree all roc 0.801 pr 0.0581 rec@1% 0.412
+60 1 rf all roc 0.886 pr 0.1057 rec@1% 0.473
+60 1 rf no_err roc 0.755 pr 0.0091 rec@1% 0.097
+60 1 svm_rbf all roc 0.835 pr 0.0473 rec@1% 0.423
+60 2 logistic all roc 0.826 pr 0.0650 rec@1% 0.329
+60 2 logistic no_err roc 0.687 pr 0.0212 rec@1% 0.113
+60 2 knn50 all roc 0.823 pr 0.0663 rec@1% 0.367
+60 2 gaussNB all roc 0.796 pr 0.0259 rec@1% 0.390
+60 2 tree all roc 0.776 pr 0.0551 rec@1% 0.362
+60 2 rf all roc 0.863 pr 0.0731 rec@1% 0.411
+60 2 rf no_err roc 0.737 pr 0.0161 rec@1% 0.122
+60 2 svm_rbf all roc 0.828 pr 0.0505 rec@1% 0.386
+                           roc              pr            rec1           prec1            prev        
+                          mean     std    mean     std    mean     std    mean     std    mean     std
+h  model      features                                                                                
+7  gaussNB    all       0.7468  0.2120  0.0031  0.0025  0.1619  0.1402  0.0038  0.0033  0.0002  0.0000
+   knn50      all       0.8512  0.0243  0.0491  0.0136  0.4802  0.0226  0.0116  0.0006  0.0002  0.0000
+   logistic   all       0.8658  0.0170  0.0664  0.0054  0.4468  0.0299  0.0108  0.0002  0.0002  0.0000
+              no_err    0.7092  0.0109  0.0013  0.0008  0.0520  0.0211  0.0013  0.0006  0.0002  0.0000
+   rf         all       0.9197  0.0044  0.0612  0.0177  0.5700  0.0125  0.0138  0.0003  0.0002  0.0000
+              no_err    0.7770  0.0294  0.0059  0.0044  0.1632  0.0501  0.0040  0.0014  0.0002  0.0000
+   rule_err>0 all       0.7800  0.0077  0.0013  0.0001  0.0717  0.0347  0.0017  0.0008  0.0002  0.0000
+   svm_rbf    all       0.7966  0.0042  0.0168  0.0029  0.5049  0.0095  0.0122  0.0003  0.0002  0.0000
+   tree       all       0.7616  0.0130  0.0162  0.0046  0.4461  0.0183  0.0108  0.0004  0.0002  0.0000
+30 gaussNB    all       0.7263  0.1880  0.0119  0.0094  0.0332  0.0298  0.0035  0.0031  0.0011  0.0000
+   knn50      all       0.8464  0.0145  0.0763  0.0116  0.4538  0.0316  0.0482  0.0028  0.0011  0.0000
+   logistic   all       0.8642  0.0332  0.0818  0.0090  0.4143  0.0354  0.0440  0.0036  0.0011  0.0000
+              no_err    0.6961  0.0229  0.0084  0.0053  0.1083  0.0229  0.0115  0.0024  0.0011  0.0000
+   rf         all       0.8872  0.0176  0.0794  0.0171  0.5073  0.0308  0.0539  0.0027  0.0011  0.0000
+              no_err    0.7384  0.0174  0.0079  0.0015  0.1315  0.0097  0.0140  0.0010  0.0011  0.0000
+   rule_err>0 all       0.7801  0.0095  0.0059  0.0003  0.0824  0.0175  0.0087  0.0018  0.0011  0.0000
+   svm_rbf    all       0.8367  0.0302  0.0380  0.0052  0.4453  0.0286  0.0473  0.0026  0.0011  0.0000
+   tree       all       0.8001  0.0296  0.0442  0.0098  0.4239  0.0709  0.0450  0.0070  0.0011  0.0000
+60 gaussNB    all       0.7114  0.1783  0.0163  0.0128  0.1423  0.2156  0.0269  0.0416  0.0017  0.0002
+   knn50      all       0.8399  0.0149  0.0865  0.0182  0.4099  0.0390  0.0712  0.0011  0.0017  0.0002
+   logistic   all       0.8561  0.0262  0.0848  0.0183  0.3716  0.0455  0.0646  0.0071  0.0017  0.0002
+              no_err    0.7103  0.0211  0.0114  0.0086  0.0754  0.0322  0.0135  0.0070  0.0017  0.0002
+   rf         all       0.8774  0.0124  0.1009  0.0257  0.4577  0.0408  0.0796  0.0044  0.0017  0.0002
+              no_err    0.7481  0.0100  0.0117  0.0039  0.1051  0.0145  0.0185  0.0043  0.0017  0.0002
+   rule_err>0 all       0.7712  0.0135  0.0093  0.0010  0.0786  0.0064  0.0138  0.0023  0.0017  0.0002
+   svm_rbf    all       0.8200  0.0197  0.0517  0.0051  0.4144  0.0254  0.0722  0.0039  0.0017  0.0002
+   tree       all       0.7787  0.0207  0.0579  0.0028  0.3981  0.0312  0.0692  0.0032  0.0017  0.0002
+         km    naive  logistic       rf
+h                                      
+7   0.00024  0.00024   0.00033  0.00023
+30  0.00106  0.00106   0.00132  0.00090
+60  0.00174  0.00175   0.00227  0.00143
+logistic share of drives with non-monotonic cumulative curve: 0.051
+rf share of drives with non-monotonic cumulative curve: 0.271

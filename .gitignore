@@ -1,0 +1,23 @@
+# Dades de Backblaze: 14 GB (zip, CSV diaris i parquet consolidat).
+# Es tornen a generar descarregant els trimestres i executant scripts/consolidate.py.
+dataset/backblaze/data/
+
+# Taules intermèdies grans que es poden regenerar (build.py).
+# Els CSV i els logs petits de out/ sí que es versionen.
+dataset/backblaze/out/*.parquet
+
+# Entorn de Python: depèn de cada màquina. Es recrea amb requirements.txt.
+.venv/
+venv/
+
+# Fitxers generats per Python, Jupyter i editors.
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Configuració personal de Claude Code (cadascú la seva; el context compartit és a AGENTS.md).
+CLAUDE.md
