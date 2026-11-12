@@ -21,3 +21,6 @@ __pycache__/
 
 # Configuració personal de Claude Code (cadascú la seva; el context compartit és a AGENTS.md).
 CLAUDE.md
+
+# Prompts personals per a assistents de codi.
+prompts/
