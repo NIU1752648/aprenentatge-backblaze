@@ -15,6 +15,14 @@ Instruccions per a qualsevol persona o assistent de codi (Claude Code, Codex, Co
 - **Reserva clau:** Backblaze decideix que un disc ha fallat en part per SMART 5, 187, 188, 197 i 198, que també són variables del model. Qualsevol resultat s'ha de llegir tenint-ho en compte (vegeu `dataset/estudi_backblaze.md`, secció 7).
 - **Estat actual i pendents:** `dataset/backblaze/context_processament.md`. Llegeix-lo abans de tocar el processament i actualitza'l quan canviï alguna cosa important.
 
+## Seguiment de tasques (Vikunja)
+
+- Les tasques i les decisions del projecte són a Vikunja, projecte **Aprenentatge-Backblaze** (id 5).
+- Servidor: `https://merayo.tail95e7de.ts.net:8445`. L'API és a `/api/v1` i només és accessible des de la tailnet.
+- El token és a `.env` (`VIKUNJA_API_TOKEN`). No es versiona ni s'escriu en cap altre fitxer.
+- Etiquetes: `A`, `B` (paquet de feina), `imprescindible`, `opcional`, `fita`, `decisió`.
+- Per modificar una tasca, `POST /tasks/{id}` substitueix la tasca sencera. Primer s'ha de llegir amb `GET`, canviar només el camp que calgui i enviar l'objecte complet.
+
 ## Entorn
 
 - Gestió de Python amb **uv**. No facis servir `pip install` ni creïs altres entorns.

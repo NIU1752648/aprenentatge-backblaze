@@ -19,8 +19,5 @@ __pycache__/
 .idea/
 *.swp
 
-# Configuració personal de Claude Code (cadascú la seva; el context compartit és a AGENTS.md).
-CLAUDE.md
-
-# Prompts personals per a assistents de codi.
-prompts/
+# Secrets locals (tokens d'API). No es versionen mai.
+.env
