@@ -13,10 +13,15 @@ from datetime import timedelta
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import pyarrow.dataset as ds
+import pyarrow.parquet as pq
 
 data_dir, out_path = sys.argv[1], sys.argv[2]
-panel = ds.dataset(sorted(glob.glob(os.path.join(data_dir, "panel", "*.parquet"))), format="parquet")
+panel_files = sorted(glob.glob(os.path.join(data_dir, "panel", "*.parquet")))
+# Quarters can keep different SMART columns: unify, missing columns read as null.
+panel = ds.dataset(panel_files, format="parquet",
+                   schema=pa.unify_schemas([pq.read_schema(f) for f in panel_files]))
 drives = pd.read_parquet(os.path.join(data_dir, "drives.parquet"))
 days = sorted(d.date() for d in pd.to_datetime(
     panel.to_table(columns=["date"]).column("date").unique().to_pylist()))

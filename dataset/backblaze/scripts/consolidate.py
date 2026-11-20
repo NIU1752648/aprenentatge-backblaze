@@ -3,8 +3,12 @@
 Layer 1, panel:  <out>/panel/<label>.parquet  one row per drive and day,
                  only *_raw SMART columns that are not (almost) empty,
                  one row group per day (filter by date is cheap).
-Layer 2, drives: <out>/drives.parquet  one row per drive, rebuilt from every
-                 file in <out>/panel/, so adding quarters just works.
+Layer 2, drives: <out>/drives_q/<label>.parquet  per-quarter drive aggregate;
+                 <out>/drives.parquet  one row per drive, combined from every
+                 file in <out>/drives_q/, so adding quarters just works and
+                 only one quarter is ever held in memory.
+Readers of panel/ must unify the schemas of the quarters (the kept SMART
+columns can differ between quarters): see open_panel() in build.py.
 
 Usage: python -I consolidate.py <dir with daily csv files> <out dir> <label>
    ex: python -I consolidate.py data/q4 data 2025Q4
@@ -43,8 +47,8 @@ DICT = ["model", "datacenter", "is_legacy_format"]
 
 
 def header(f):
-    with open(f) as fh:
-        return fh.readline().strip().lstrip("﻿").split(",")
+    with open(f, encoding="utf-8-sig") as fh:
+        return fh.readline().strip().split(",")
 
 
 def smart_key(c):
@@ -96,17 +100,17 @@ print(f"rows {n_rows}; keep {len(keep)} SMART columns, drop {len(drop)} (>{MAX_N
 # Pass 2: rewrite with the kept columns, dictionary-encoded strings.
 final_cols = list(BASE) + keep
 panel_path = os.path.join(out_dir, "panel", f"{label}.parquet")
-src = pq.ParquetFile(tmp)
 out_schema = None
 with_dict = None
-for g in range(src.num_row_groups):
-    t = src.read_row_group(g, columns=final_cols)
-    for c in DICT:
-        t = t.set_column(t.schema.get_field_index(c), c, pc.dictionary_encode(t[c]))
-    if with_dict is None:
-        out_schema = t.schema
-        with_dict = pq.ParquetWriter(panel_path, out_schema, compression="zstd")
-    with_dict.write_table(t.cast(out_schema), row_group_size=len(t))
+with pq.ParquetFile(tmp) as src:  # must be closed before removing it (Windows)
+    for g in range(src.num_row_groups):
+        t = src.read_row_group(g, columns=final_cols)
+        for c in DICT:
+            t = t.set_column(t.schema.get_field_index(c), c, pc.dictionary_encode(t[c]))
+        if with_dict is None:
+            out_schema = t.schema
+            with_dict = pq.ParquetWriter(panel_path, out_schema, compression="zstd")
+        with_dict.write_table(t.cast(out_schema), row_group_size=len(t))
 with_dict.close()
 os.remove(tmp)
 
@@ -117,15 +121,13 @@ pa.Table.from_pydict({
 }).to_pandas().to_csv(os.path.join(out_dir, "panel", f"{label}_columns.csv"), index=False)
 print("panel saved", panel_path, f"{os.path.getsize(panel_path) / 2**20:.0f} MB", flush=True)
 
-# Layer 2: drive table from every quarter in panel/.
-panels = sorted(glob.glob(os.path.join(out_dir, "panel", "*.parquet")))
+# Layer 2a: per-quarter drive aggregate (one quarter in memory at a time).
 cols = ["date", "serial_number", "model", "capacity_bytes", "datacenter", "failure", "smart_9_raw"]
-t = pa.concat_tables(
-    [pq.read_table(p, columns=cols).cast(pa.schema([
-        ("date", pa.date32()), ("serial_number", pa.string()), ("model", pa.string()),
-        ("capacity_bytes", pa.int64()), ("datacenter", pa.string()), ("failure", pa.int8()),
-        ("smart_9_raw", pa.float64())])) for p in panels]
-)
+t = pq.read_table(panel_path, columns=cols)
+t = t.cast(pa.schema([
+    ("date", pa.date32()), ("serial_number", pa.string()), ("model", pa.string()),
+    ("capacity_bytes", pa.int64()), ("datacenter", pa.string()), ("failure", pa.int8()),
+    ("smart_9_raw", pa.float64())]))
 t = t.sort_by([("serial_number", "ascending"), ("date", "ascending")])
 t = t.append_column("fail_d", pc.if_else(pc.equal(t["failure"], 1), t["date"], pa.scalar(None, pa.date32())))
 g = t.group_by("serial_number", use_threads=False).aggregate([
@@ -139,35 +141,51 @@ g = t.group_by("serial_number", use_threads=False).aggregate([
     ("smart_9_raw", "first"),
     ("smart_9_raw", "last"),
 ])
-d = g.to_pandas().rename(columns={
-    "model_last": "model",
-    "capacity_bytes_max": "capacity_bytes",
-    "datacenter_last": "datacenter",
-    "date_min": "first_seen",
-    "date_max": "last_seen",
-    "date_count": "n_days",
-    "fail_d_min": "fail_date",
-    "smart_9_raw_first": "power_on_hours_first",
-    "smart_9_raw_last": "power_on_hours_last",
-})
+del t
+g = g.rename_columns(["serial_number", "model", "capacity_bytes", "datacenter", "first_seen", "last_seen",
+                      "n_days", "fail_date", "power_on_hours_first", "power_on_hours_last"])
+os.makedirs(os.path.join(out_dir, "drives_q"), exist_ok=True)
+pq.write_table(g, os.path.join(out_dir, "drives_q", f"{label}.parquet"), compression="zstd")
+print("quarter drives", g.num_rows, flush=True)
+del g
+
+# Layer 2b: drive table, combining the aggregates of every quarter in drives_q/.
 import pandas as pd  # noqa: E402
 
+parts = sorted(glob.glob(os.path.join(out_dir, "drives_q", "*.parquet")))
+q = pd.concat([pd.read_parquet(p) for p in parts], ignore_index=True)
 for c in ["first_seen", "last_seen", "fail_date"]:
-    d[c] = pd.to_datetime(d[c])
+    q[c] = pd.to_datetime(q[c])
+q = q.sort_values(["serial_number", "first_seen"])
+d = q.groupby("serial_number", sort=True).agg(
+    model=("model", "last"),
+    capacity_bytes=("capacity_bytes", "max"),
+    datacenter=("datacenter", "last"),
+    first_seen=("first_seen", "min"),
+    last_seen=("last_seen", "max"),
+    n_days=("n_days", "sum"),
+    fail_date=("fail_date", "min"),
+    power_on_hours_first=("power_on_hours_first", "first"),
+    power_on_hours_last=("power_on_hours_last", "last"),
+    n_quarters=("first_seen", "size"),
+).reset_index()
 data_end = d.last_seen.max()
 d["failed"] = d.fail_date.notna().astype("int8")
 d["end_date"] = d.fail_date.fillna(d.last_seen)
 d["duration_days"] = (d.end_date - d.first_seen).dt.days
+# days inside [first_seen, last_seen] without a row (drive temporarily out of the data)
+d["absent_days"] = ((d.last_seen - d.first_seen).dt.days + 1 - d.n_days).astype("int32")
 d["censoring"] = "failed"
 d.loc[(d.failed == 0) & (d.last_seen == data_end), "censoring"] = "alive_at_end"
 d.loc[(d.failed == 0) & (d.last_seen < data_end), "censoring"] = "left_data"
 d["model"] = d.model.astype("category")
 d["datacenter"] = d.datacenter.astype("category")
 d = d[["serial_number", "model", "capacity_bytes", "datacenter", "first_seen", "last_seen", "n_days",
-       "fail_date", "failed", "end_date", "duration_days", "censoring",
+       "absent_days", "n_quarters", "fail_date", "failed", "end_date", "duration_days", "censoring",
        "power_on_hours_first", "power_on_hours_last"]]
 drives_path = os.path.join(out_dir, "drives.parquet")
 d.to_parquet(drives_path, index=False)
+print("quarters combined:", [os.path.basename(p) for p in parts], flush=True)
 print("drives saved", drives_path, d.shape, "failed", int(d.failed.sum()), flush=True)
 print(d.censoring.value_counts().to_string(), flush=True)
 print(f"total {time.time() - t0:.0f}s", flush=True)

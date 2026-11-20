@@ -21,3 +21,6 @@ __pycache__/
 
 # Secrets locals (tokens d'API). No es versionen mai.
 .env
+
+# Memòria cau de marimo.
+__marimo__/
