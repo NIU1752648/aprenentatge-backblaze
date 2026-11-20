@@ -51,7 +51,7 @@ def _():
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    # 02 · L'etiqueta és una decisió humana: què vol dir i quant ens costa
+    # 01b · L'etiqueta és una decisió humana: què vol dir i quant ens costa
 
     Continuació de `01_dades.py`. Allà vam veure que les fallades registrades cauen per festes
     mentre els discs es continuen deteriorant igual. Aquí:

@@ -80,7 +80,7 @@ Notebook `notebooks/01_dades.py`, amb dades fins al 4-1-2026 (regla del pla, sec
 - **Dia de la setmana:** les fallades es registren un 35 % menys en diumenge i dilluns, i les sortides sense fallar es concentren en dilluns. Les dates setmanals sempre en dimecres neutralitzen l'efecte.
 - **Caiguda de reporting el 12-5-2025:** 70.446 discs (29 %) absents aquell dia. Infla els dies d'absència de les dates de maig i juny.
 
-**Mesura de l'error d'etiqueta** (`notebooks/02_etiquetes.py`, 20-11-2026). Mostra de les 40 dates de desenvolupament amb tots els discs que fallen i un 5 % de la resta, amb pesos; es desa a `out/label_study.parquet`. Models GB i logística, validació creuada per disc, t = 30 i 60:
+**Mesura de l'error d'etiqueta** (`notebooks/01b_etiquetes.py`, 20-11-2026). Mostra de les 40 dates de desenvolupament amb tots els discs que fallen i un 5 % de la resta, amb pesos; es desa a `out/label_study.parquet`. Models GB i logística, validació creuada per disc, t = 30 i 60:
 
 - **Dependència de la regla humana:**
   - La regla del tècnic (comptadors que pugen) ja captura un 46 % de les fallades a 30 dies amb l'1 % d'alertes. El GB en captura un 52 %.
