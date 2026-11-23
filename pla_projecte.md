@@ -367,6 +367,11 @@ G  F  M  A  M  J  J  A  S  O  N  D  |  G  F  M  A  M  J
   - **Desequilibri.** Mateixa mostra i mateixa correcció d'odds que la resta. Com que minimitza la log loss, les probabilitats ja surten raonablement calibrades **[S]**; es comprova igual que amb els altres.
   - **Per què encaixa amb la pregunta.** El random forest redueix variància fent la mitjana d'arbres profunds; el boosting redueix biaix sumant arbres poc profunds. Si el boosting guanya sobretot a la franja 30–60, on el senyal és feble, diu que el problema allà és de biaix, no de soroll.
   - **Opcional, fora de les diapositives:** `interaction_cst` permet un model sense interaccions (suma de funcions d'una variable). Comparar-lo amb el complet diu si el senyal necessita combinar variables (per exemple, fabricant × comptador). `monotonic_cst` permet obligar el risc a créixer amb els comptadors d'error **[C]**; no és del temari.
+- **Explicabilitat amb SHAP (tema Explainability, afegit el 23-11-2026).** TreeSHAP per al gradient boosting i el random forest, calculat sobre una mostra fixa (totes les alertes i uns milers de discs sense alerta). Comprovat: `shap` 0.54.1 funciona amb Python 3.14, scikit-learn 1.9.1 i `HistGradientBoostingClassifier` amb absents, i la suma de contribucions coincideix exactament amb la sortida en log-odds.
+  - **Per grups.** Per la propietat d'eficiència, les contribucions sumen la predicció i es poden sumar per grup (G0, G1, GO, G2, G3). Per a cada alerta diu quina part del risc ve dels comptadors d'error de la regla de Backblaze. Complementa E1 (què aporta cada grup en conjunt) i E2 (en què es basa el model quan encerta una fallada neta).
+  - **Gràfics:** beeswarm per franja (el pes dels comptadors baixa amb l'horitzó?) i waterfall d'unes quantes alertes reals per a l'aplicació (per què salta l'avís).
+  - **Escala.** Al gradient boosting, SHAP explica els log-odds; la correcció per mostreig hi suma una constant i només mou el valor base. Al random forest explica la probabilitat abans de la correcció, que no és lineal: les contribucions es comparen entre variables, però no són punts de probabilitat real.
+  - **Límits que cal dir.** Les variables correlacionades (nivell i canvi d'un comptador) es reparteixen el mèrit, i per això es resumeix per grups. SHAP explica el que ha après el model, no relacions causals. La logística no ho necessita (coeficients) i k-NN i SVM queden fora (KernelSHAP és lent i no aporta res a la història). LIME no es fa servir.
 - **Random forest i error «out-of-bag».** L'error OOB es calcula per fila i les files d'un disc estan correlacionades, així que surt optimista. Comparar OOB, validació per disc i test temporal del mateix model és un experiment gratuït (2.4).
 
 ### 2.3 Combinacions
@@ -546,6 +551,11 @@ Els números de diapositiva són la pàgina del PDF de `../teoria/`. Les fórmul
 | Versió per histogrames de scikit-learn | Implementacions diferents: particions per histogrames, com LightGBM | Gradient Boosting 19 |
 | Entrenament més lent que el random forest | Els arbres del boosting s'entrenen en sèrie; els del random forest, en paral·lel | Gradient Boosting 21; Decision Trees 33 |
 | Bootstrap per disc | Mostreig amb reposició, aplicat a discs i no a files | Decision Trees 23 |
+| SHAP per explicar el gradient boosting i el random forest | Valors de Shapley: contribució marginal mitjana de cada variable; TreeSHAP per a models d'arbres | Explainability 12–17 |
+| Sumar SHAP per grups de variables | Eficiència: els valors sumen la predicció menys el valor base | Explainability 14, 16 |
+| SHAP en log-odds al boosting i en probabilitat al random forest | Els valors són additius en l'espai de sortida del model | Explainability 18 |
+| Beeswarm i waterfall | Explicació global a partir de les locals; descomposició d'una predicció | Explainability 6, 19–21 |
+| Resumir per grups i no per variable | Amb variables correlacionades és difícil repartir la importància; l'explicació no és causal | Explainability 23 |
 
 ### 4.2 Preguntes probables i resposta breu
 
@@ -633,7 +643,7 @@ L'ordre segueix les parts de la pregunta enviada.
 | `01_dades.py` | Parc, fallades per setmana, absències, SMART per fabricant, regles R1 i R2 | `drives.parquet`, mostra de dates |
 | `02_validacio.py` | Partició, recomptes per franja, E6 | Capes 3–5 |
 | `03_models.py` | Corbes de validació per hiperparàmetre (inclosa la corba d'early stopping del boosting), taula dels set models, E4 | Resultats de la cerca, capa 5 |
-| `04_senyal.py` | E1, E2, arbre dibuixat, importància per permutació | Capa 5 |
+| `04_senyal.py` | E1, E2, arbre dibuixat, importància per permutació, SHAP per grups (beeswarm per franja i waterfall d'alertes) | Capa 5 |
 | `05_aplicacio.py` | Corba de pressupost, classes d'urgència, antelació, cost amb controls per a k i ρ, calibratge, corbes de risc, supervivència per grup de risc | Capa 5, `drives.parquet` |
 
 Els scripts pesats (consolidar, construir la taula, entrenar i puntuar) continuen a `dataset/backblaze/scripts/`. `05_aplicacio.py` es pot obrir com a aplicació durant les preguntes.
@@ -691,7 +701,7 @@ Estat a 19-11-2026, després de la reunió de la parella. **Decidit** vol dir qu
 | 8 | Pressupost per a l'aplicació | **Pendent** | Proposta: corba sencera, amb 0,1 % i 1 % marcats | Només 1 % |
 | 9 | Mostreig de negatius | **Pendent** | Proposta: per disc (15 %) i una de cada deu dates | Per fila |
 | 10 | Models a les diapositives | **Decidit** | Logística, random forest i gradient boosting; la resta en una taula | Tots set amb el mateix pes |
-| 11 | Model fora del temari | **Decidit** | Cap, tret de Kaplan-Meier per a l'esperança | — |
+| 11 | Model fora del temari | **Decidit** | Cap, tret de Kaplan-Meier per a l'esperança. SHAP és del temari (tema Explainability, afegit el 23-11-2026) i es fa servir per al gradient boosting i el random forest | — |
 | 12 | Franja 60–90 dies | **Decidit** | De moment no. Queda com a recurs si a la pregunta d'antelació li falta informació | Sí des del principi |
 | 13 | Repartiment dels paquets A i B | **Pendent** | Qui tingui el homelab, millor A | — |
 | 14 | Seguiment amb el professor | **Pendent** | Proposta: ensenyar-li Q0 i la definició d'«esperança» a la propera classe | — |
