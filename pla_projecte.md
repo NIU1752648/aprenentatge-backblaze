@@ -15,7 +15,7 @@ Té tres parts, i el pla hi afegeix un angle propi:
 | Part | Com es respon |
 | --- | --- |
 | **Probabilitat** de fallar en t dies | Model per franges de temps (0–7, 7–30, 30–60 dies) que dona una probabilitat acumulada monòtona i calibrada |
-| **Esperança** | Supervivència observada dels discs del test agrupats pel risc predit, seguits fins a 174 dies; per disc, dies de vida esperats dins dels 60 dies |
+| **Esperança** | Supervivència observada (Kaplan-Meier) dels discs del test agrupats pel risc predit, seguits fins a 174 dies (decisió 15) |
 | **Quins substituir i quan** | Alertes setmanals amb pressupost; classe d'urgència segons la franja on es concentra el risc; antelació i cost |
 | **Angle propi: de què ens podem refiar** | La pregunta diu «a partir de l'estat SMART», i Backblaze declara fallades en part pels mateixos SMART. Mesurem quina part del senyal és aquesta regla i quina és anticipació |
 
@@ -72,7 +72,7 @@ La pregunta ja està formalitzada amb el professor, així que el pla la respon t
 | | Part de la pregunta | Definició operativa | Experiments | Què es presenta |
 | --- | --- | --- | --- | --- |
 | **Q1** | «Quina probabilitat hi ha que falli en els propers t dies» | P(T ≤ t \| estat a la data de referència) per a t = 7, 30 i 60, amb el model de franges, calibrada | E3, E4, calibratge | Taula de models per franja, corbes acumulades, fiabilitat |
-| **Q2** | «Quina esperança podem donar a aquests discs» | Per grup de risc: supervivència observada al test fins a 174 dies. Per disc: dies de vida esperats dins dels 60 dies | E7 | Corbes de supervivència per grup de risc |
+| **Q2** | «Quina esperança podem donar a aquests discs» | Per grup de risc: supervivència observada al test fins a 174 dies, amb Kaplan-Meier (decisió 15) | E7 | Corbes de supervivència per grup de risc |
 | **Q3** | «Quins discs s'han de substituir i quan» | Quins: els k primers per risc, o els que superen el llindar de cost. Quan: classe d'urgència segons la franja | E5 | Corba de pressupost, classes d'urgència, antelació |
 | **Q0** | «A partir de l'estat SMART» (angle propi) | Quina part de l'estat SMART porta la informació, i si és circular amb la definició de fallada | E1, E2 | Resultat central |
 
@@ -108,7 +108,7 @@ Amb horitzons de fins a 60 dies i un 0,17 % de fallades, el model no pot donar u
 | Opció | Què és | A favor | En contra | Recomanació |
 | --- | --- | --- | --- | --- |
 | **Supervivència observada per grup de risc** | Agrupar els discs del test pel risc predit a la primera data (7-1-2026) i seguir-los amb Kaplan-Meier fins al 30-6-2026 (174 dies) | Sense supòsits. Figura clara. Kaplan-Meier ja el teniu. Comprova el model més enllà dels 60 dies | És per grup, no per disc. Seguiment màxim de 174 dies | **Principal** |
-| Esperança restringida a 60 dies, per disc | Àrea sota la corba de supervivència del model de franges fins a 60 dies | Surt del model sense cap supòsit | Per a gairebé tots els discs val 59,9 dies; només és expressiva en discs de risc alt | Calcular-la i ensenyar-la per a discs de risc alt |
+| Esperança restringida a 60 dies, per disc | Àrea sota la corba de supervivència del model de franges fins a 60 dies | Surt del model sense cap supòsit | Per a gairebé tots els discs val 59,9 dies; només és expressiva en discs de risc alt | **Descartada** (decisió 15, 24-11-2026): ens desvia de la pregunta principal |
 | Extrapolació amb risc constant | Vida mediana = ln 2 / λ, amb λ el risc diari deduït de la probabilitat a 60 dies | Dona un número per disc | Suposa que el risc no canvia. Per a un disc sa dona desenes d'anys | Només com a frase per a discs de risc alt, contrastada amb la supervivència observada |
 | Taula de vida per edat i fabricant | Risc per any d'edat (hores d'ús), a partir de `drives.parquet` | Barata. És la referència «taxa per model i edat» | No fa servir l'estat SMART. Backblaze ja publica anàlisis de vida per edat **[S]**, i el professor no vol repetir anàlisis dels creadors | Només com a referència, no com a resultat |
 
@@ -400,7 +400,7 @@ G  F  M  A  M  J  J  A  S  O  N  D  |  G  F  M  A  M  J
 | **E4** | Franges (b) contra horitzons separats (a): monotonia, calibratge, ordenació | Logística, random forest, gradient boosting | Imprescindible |
 | **E5** | Simulació d'alertes setmanals: corba de pressupost, antelació, cost | Model final, R2, R3 | Imprescindible |
 | **E6** | Com canvia la xifra segons la validació: K-fold per fila, OOB, `GroupKFold` per disc, test temporal | Random forest | Recomanat; barat i molt defensable |
-| **E7** | Esperança: supervivència observada per grup de risc predit, fins a 174 dies; esperança restringida a 60 dies per disc | Model final | Imprescindible (és una part de la pregunta) |
+| **E7** | Esperança: supervivència observada (Kaplan-Meier) per grup de risc predit, fins a 174 dies | Model final | Imprescindible (és una part de la pregunta) |
 | E8 | Variants de Naive Bayes | — | Opcional |
 | E9 | Model per fabricant, mitjana de models, gradient boosting sense interaccions, franja 60–90 (només si a l'antelació li falta informació) | — | Opcional |
 
@@ -578,7 +578,7 @@ Els números de diapositiva són la pàgina del PDF de `../teoria/`. Les fórmul
 | Per què cauen les fallades al desembre? | L'etiqueta es posa quan es retira el disc, i per festes es retiren menys discs. Reforça que l'etiqueta és una decisió operativa |
 | Els discs que desapareixen de les dades, què són? | La majoria tornen (85 %). Tenen 18 vegades més risc de fallar; per això els dies d'absència són una variable |
 | Com sabeu que una diferència entre models és real? | Bootstrap per disc al test, amb diferències aparellades |
-| Què vol dir «esperança» si només mireu 60 dies? | Per disc, només podem donar els dies de vida esperats dins dels 60 dies. Per això ensenyem la supervivència observada per grup de risc fins a 174 dies, que no extrapola res |
+| Què vol dir «esperança» si només mireu 60 dies? | El model només mira 60 dies i no extrapolem. L'esperança es dona per grup de risc: la supervivència observada amb Kaplan-Meier fins a 174 dies, que no suposa res |
 | Què vol dir «quan»? | La classe d'urgència: en quina franja el risc del disc supera el llindar |
 | El resultat de k-NN i SVM depèn de la submostra? | S'entrenen amb submostra per cost; no són models principals. La variació entre grups de la validació creuada dona una idea de l'estabilitat |
 | Què faríeu amb més temps? | Franja 60–90 dies, dos anys de dades per a la deriva, i el motiu de retirada si Backblaze el publiqués |
@@ -699,13 +699,13 @@ Estat a 24-11-2026 (reunió de la parella del 19-11 i decisions del 24-11). **De
 | 6 | Variables d'absència (GO) | **Decidit** | Grup separat a l'escala de variables | No incloure-les |
 | 7 | Mètrica de selecció | **Decidit** (24-11) | Detecció amb l'1 % d'alertes per seleccionar; PR-AUC i ROC-AUC com a secundàries | PR-AUC com a principal |
 | 8 | Pressupost per a l'aplicació | **Pendent** | Proposta: corba sencera, amb 0,1 % i 1 % marcats | Només 1 % |
-| 9 | Mostreig de negatius | **Pendent** | Proposta: per disc (15 %) i una de cada deu dates | Per fila |
+| 9 | Mostreig de negatius | **Pendent** (es decideix amb la corba d'aprenentatge, `learning_curve.py` al homelab) | Proposta inicial: per disc (15 %) i una de cada deu dates. Entrenar amb tot és viable per al gradient boosting (4 min amb 12,8 M de files) i la logística, però no per a k-NN i SVM | Per fila |
 | 10 | Models a les diapositives | **Decidit** | Logística, random forest i gradient boosting; la resta en una taula | Tots set amb el mateix pes |
 | 11 | Model fora del temari | **Decidit** | Cap, tret de Kaplan-Meier per a l'esperança. SHAP és del temari (tema Explainability, afegit el 23-11-2026) i es fa servir per al gradient boosting i el random forest | — |
 | 12 | Franja 60–90 dies | **Decidit** | De moment no. Queda com a recurs si a la pregunta d'antelació li falta informació | Sí des del principi |
 | 13 | Repartiment dels paquets A i B | **Pendent** | Qui tingui el homelab, millor A | — |
 | 14 | Seguiment amb el professor | **Pendent** | Proposta: ensenyar-li Q0 i la definició d'«esperança» a la propera classe | — |
-| 15 | Definició d'«esperança» | **Pendent** | Proposta: supervivència observada per grup de risc, i esperança restringida a 60 dies per disc | Extrapolació amb risc constant; taula de vida per edat |
+| 15 | Definició d'«esperança» | **Decidit** (24-11) | Només la supervivència observada amb Kaplan-Meier per grup de risc predit (0,1 %, 0,1–1 %, 1–10 %, resta) a la primera data de test, fins a 174 dies, per no desviar-nos de la pregunta principal | Esperança restringida a 60 dies per disc; extrapolació amb risc constant; taula de vida per edat |
 | 16 | Definició de «quan» | **Decidit** | Classes d'urgència per franja | Només el pressupost setmanal |
 | 17 | Ús de la GPU | **Decidit** | No es fa servir. Tot amb scikit-learn i CPU | Experiment de k-NN i SVM amb tota la mostra: descartat |
 | 18 | Paper del gradient boosting | **Decidit** | Model principal, al costat del random forest; E1 amb el millor dels dos a D2 | Només a la taula comparativa |

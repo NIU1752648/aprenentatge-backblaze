@@ -217,17 +217,25 @@ A la presentació hi aniran la regressió logística, el random forest i el grad
 
 ---
 
-## 6. Decisions pendents (cal parlar-ne tots dos)
+## 6. Decisions
 
-| # | Decisió | Proposta | Per què importa |
-| --- | --- | --- | --- |
-| Vikunja #144 | **Quins discs entren a cada dimecres** | Ara hi entren els discs que tenen fila aquell dimecres. Proposta: els vistos en els 7 dies anteriors | Amb la regla actual, un 15 % de les fallades no surten mai a la franja de 0 a 7 dies, perquè el disc no hi era el dimecres anterior. Precisament són discs que han faltat uns dies, el senyal que volem estudiar. Canviar-ho vol dir regenerar la taula (4 minuts) |
-| Vikunja #70 | **Festes** | Tallar les etiquetes de desenvolupament el 16-11-2025, sense variable de calendari. El test comença el 7-1-2026 | Si no, entrenem amb etiquetes on falten fallades |
-| 13 al pla | **Repartiment de la feina** | A (dades, validació i aplicació) per a qui té el homelab; B (models i experiment central) per a l'altre | Ara a Vikunja no hi ha ningú assignat |
-| 7 al pla | Mètrica per triar models | Detecció amb l'1 % d'alertes | Provisional |
-| 9 al pla | Mostreig de negatius | 15 % dels discs i un de cada deu dimecres | L'estudi d'etiquetes suggereix que potser cal una mostra més gran, o bé recalibrar |
+**Preses el 24-11-2026:**
 
----
+| Decisió | Què hem decidit |
+| --- | --- |
+| Quins discs entren a cada dimecres (Vikunja #144) | Els vistos en els 7 dies anteriors, amb els seus últims valors. Ara un 95 % de les fallades surten a la franja de 0 a 7 dies d'algun dimecres (abans, un 85 %) |
+| Festes (Vikunja #70) | Les etiquetes de desenvolupament es tallen el 16-11-2025 i el test comença el 7-1-2026. L'entrenament no fa servir cap informació posterior al tall, ni tan sols per saber si un disc segueix viu |
+| Mètrica per triar models | Detecció amb l'1 % d'alertes. PR-AUC i ROC-AUC com a secundàries |
+| Què vol dir «esperança» | Només la supervivència observada amb Kaplan-Meier per grups de risc, fins a 174 dies. No calculem «dies de vida» per disc, per no desviar-nos de la pregunta principal |
+
+**Encara pendents:**
+
+| Decisió | Proposta | Com es decideix |
+| --- | --- | --- |
+| Quantes dades fem servir per entrenar | Ara, 15 % dels discs sense fallada i un de cada deu dimecres | Amb la corba d'aprenentatge (`learning_curve.py`) al homelab. Entrenar amb tot és viable per al gradient boosting i la logística, però no per a k-NN i SVM |
+| Repartiment de la feina | A (dades, validació i aplicació) per a qui té el homelab; B (models i experiment central) per a l'altre | Entre nosaltres |
+| Pressupost per a l'aplicació | Corba sencera, amb el 0,1 % i l'1 % marcats | Entre nosaltres |
+| Seguiment amb el professor | Ensenyar-li l'angle propi i la definició d'esperança | A la propera classe |
 
 ## 7. Següents passos
 
@@ -235,7 +243,7 @@ El calendari és ajustat: entrega el 13-12 i presentació el 14 i el 16-12, amb 
 
 ### Aquesta setmana (23–29 de novembre)
 
-**Abans de res, tots dos:** decidir les quatre primeres decisions de la secció 6.
+**Abans de res:** executar la corba d'aprenentatge al homelab per decidir quantes dades fem servir, i després la validació creuada (`cv_models.py`).
 
 **Paquet A (dades, validació i aplicació):**
 
