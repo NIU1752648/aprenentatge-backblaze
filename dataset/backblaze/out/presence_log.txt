@@ -1,0 +1,42 @@
+drives 372456 days 546 2025-01-01 -> 2026-06-30 bytes per drive 69
+  2025-01-01 present 304957 (1s)
+  2025-03-02 present 313145 (17s)
+  2025-05-01 present 315374 (34s)
+  2025-06-30 present 321201 (52s)
+  2025-08-29 present 324862 (69s)
+  2025-10-28 present 335635 (90s)
+  2025-12-27 present 339145 (109s)
+  2026-02-25 present 339572 (128s)
+  2026-04-26 present 349260 (148s)
+  2026-06-25 present 355133 (168s)
+panel days without data: none
+written (170s)
+check popcount == n_days: mismatches 0
+check first bit == first_seen: mismatches 0
+check last bit == last_seen: mismatches 0
+check column sums == n_present: True
+drive-days present after min(last_seen, fail_date): 5157
+
+outage days (absent_share > 0.05): 1
+      date  n_present  n_expected  absent_share
+2025-05-12     245997      316643      0.223109
+
+absent_share on non-outage days:
+  median 0.00182  mean 0.00234  p90 0.00493  p99 0.00627  max 0.00806  min -0.00006
+days with absent_share in (0.010, 0.20):
+  none
+top 10 absent_share:
+      date  absent_share  outage
+2025-05-12      0.223109    True
+2026-03-03      0.008064   False
+2026-01-25      0.007745   False
+2025-09-09      0.007188   False
+2026-02-09      0.006537   False
+2026-02-08      0.006467   False
+2026-02-06      0.006299   False
+2026-02-02      0.006222   False
+2026-02-10      0.006175   False
+2026-02-04      0.006160   False
+presence.parquet: 1.4 MB
+presence_days.parquet: 0.0 MB
+total 172s

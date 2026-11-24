@@ -133,6 +133,19 @@ Notebook `notebooks/01_dades.py`, amb dades fins al 4-1-2026 (regla del pla, sec
 
 **Per què es va canviar la població (decisió 19).** De les 5.714 primeres fallades entre el 5-2-2025 i el 6-5-2026, 852 (15 %) no cauen a la franja (0, 7] de cap dimecres: 832 són discs que no tenien fila el dimecres anterior (forat mitjà de 5 dies, un quart tornen el dia abans de fallar) i 20 apareixen per primera vegada després. Són precisament els discs que GO vol captar. Es va decidir el 24-11-2026 fer servir els discs vistos dins de [L−7, L].
 
+## Validació creuada al homelab (scripts del 24-11-2026)
+
+Dos scripts que s'executen al homelab, en aquest ordre, des de `dataset/backblaze/`. Necessiten `out/landmarks/`, `data/drives.parquet` i `data/presence.parquet`.
+
+1. **`scripts/learning_curve.py out/landmarks data out/lc --jobs N [--max-mem-gb 12]`** (decisió 9). Corba d'aprenentatge amb hiperparàmetres fixos (gradient boosting, gradient boosting amb fulla escalada i logística), per a les franges i y_30. Eixos: fracció de discs negatius {1, 2, 5, 15, 30, 50, 100} % amb totes les seves dates, i aprimament de dates {1, 1/3, 1/10} igual per a positius i negatius. Uns 5–8 h, 756 entrenaments; el gradient boosting amb totes les dades arriba a 9–10 GB i la logística a 14 GB (per defecte se salta el que passa de 12 GB). Resultat: `out/lc/lc_recommendation.json` amb la mida més petita a una desviació estàndard de la millor.
+2. **`scripts/cv_models.py out/landmarks data out/cv --jobs N [--neg-drive-frac F] [--date-step 1]`** (E3). Cerca d'hiperparàmetres de gradient boosting i logística amb `GroupKFold` per disc (K = 3, per hash), horitzons separats i franges, regla d'una desviació estàndard. Uns 5–6 h. Exposa les funcions comunes (etiquetes estrictes, particions, mostreig, mètriques) que també fa servir `learning_curve.py`.
+
+Tots dos només llegeixen les 40 dates de desenvolupament, tornen a calcular les etiquetes amb el tall estricte del 16-11-2025, desen cada resultat de seguida (es poden reprendre) i registren el calibratge mitjà (probabilitat corregida / taxa observada) per detectar errors de mostreig. Els CSV, JSON, PNG i logs de `out/lc/` i `out/cv/` es versionen; els parquet de prediccions, no.
+
+**Etiquetes estrictes (comprovat):** respecte de les desades, només canvien 338, 434 i 633 files (y_7, y_30, y_60), totes de 0 a desconegut. Positius al desenvolupament: y_7 3.438, y_30 14.038, y_60 24.569.
+
+**Avís sobre el mostreig de negatius:** no s'han d'aprimar les dates dels negatius amb un subconjunt global mentre es guarden els positius de totes les dates. `days_since_first` amb `seen_at_start` identifica la data, i el model aprèn «data fora de la mostra de negatius ⇒ positiu» (en una prova, probabilitats unes 180 vegades massa altes). Es mostreja per disc amb totes les dates; si s'aprimen dates, ha de ser igual per a les dues classes o amb una fase diferent per disc.
+
 ## Decisió en curs: separació entre entrenament i test
 
 Proposta discutida, encara no implementada:

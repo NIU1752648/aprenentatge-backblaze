@@ -6,6 +6,8 @@ dataset/backblaze/data/
 # Els CSV i els logs petits de out/ sí que es versionen.
 dataset/backblaze/out/*.parquet
 dataset/backblaze/out/landmarks/*.parquet
+# Prediccions out-of-fold i temporals de cv_models.py (out/cv/): grans, no es versionen.
+dataset/backblaze/out/**/*.parquet
 
 # Entorn de Python: depèn de cada màquina. Es recrea amb requirements.txt.
 .venv/
