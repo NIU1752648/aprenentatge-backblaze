@@ -687,17 +687,17 @@ Els scripts pesats (consolidar, construir la taula, entrenar i puntuar) continue
 
 ## Decisions obertes per a la parella
 
-Estat a 19-11-2026, després de la reunió de la parella. **Decidit** vol dir que no es torna a discutir; **provisional**, que es treballa amb la recomanació però falta confirmar-la; **pendent**, que encara no s'ha decidit.
+Estat a 24-11-2026 (reunió de la parella del 19-11 i decisions del 24-11). **Decidit** vol dir que no es torna a discutir; **provisional**, que es treballa amb la recomanació però falta confirmar-la; **pendent**, que encara no s'ha decidit.
 
 | # | Decisió | Estat | Què s'ha acordat o què falta | Alternativa descartada o oberta |
 | --- | --- | --- | --- | --- |
 | 1 | Pregunta | **Decidit** | Tancada i acordada amb el professor. Q0 es manté com a angle propi; s'hi lliga el seguiment de la decisió 14 | — |
 | 2 | Trimestres | **Decidit** | Sis: Q1 2025 – Q2 2026. La partició es deriva d'aquí (1.5) | Quatre trimestres, només com a pla B a D1 |
-| 3 | Període de test i Nadal | **Pendent d'anàlisi** | Anàlisi preliminar de Nadal (1.5 bis) per decidir com s'incorpora sense afectar el test i deixar-ho documentat per a la presentació. Les dates de 1.5 són la proposta de partida | Novembre–desembre de 2025 com a test: descartat |
+| 3 | Període de test i Nadal | **Decidit** (24-11) | Test del 7-1 al 29-4-2026. Etiquetes de desenvolupament tallades el 16-11-2025 (L + t ≤ 16-11-2025; franges posteriors censurades), sense variable de calendari. L'entrenament no fa servir cap informació posterior al tall, ni tan sols per saber que un disc segueix viu | Novembre–desembre de 2025 com a test: descartat |
 | 4 | Formulació | **Decidit** | Franges (b1), amb horitzons separats (a) com a comparació | Només (a) |
 | 5 | Freqüència de dates | **Decidit** | Setmanal (dimecres), aprimant negatius | Cada 2 setmanes |
 | 6 | Variables d'absència (GO) | **Decidit** | Grup separat a l'escala de variables | No incloure-les |
-| 7 | Mètrica de selecció | **Provisional** | Es treballa amb la detecció amb l'1 % d'alertes; falta confirmar-ho | PR-AUC |
+| 7 | Mètrica de selecció | **Decidit** (24-11) | Detecció amb l'1 % d'alertes per seleccionar; PR-AUC i ROC-AUC com a secundàries | PR-AUC com a principal |
 | 8 | Pressupost per a l'aplicació | **Pendent** | Proposta: corba sencera, amb 0,1 % i 1 % marcats | Només 1 % |
 | 9 | Mostreig de negatius | **Pendent** | Proposta: per disc (15 %) i una de cada deu dates | Per fila |
 | 10 | Models a les diapositives | **Decidit** | Logística, random forest i gradient boosting; la resta en una taula | Tots set amb el mateix pes |
@@ -709,6 +709,7 @@ Estat a 19-11-2026, després de la reunió de la parella. **Decidit** vol dir qu
 | 16 | Definició de «quan» | **Decidit** | Classes d'urgència per franja | Només el pressupost setmanal |
 | 17 | Ús de la GPU | **Decidit** | No es fa servir. Tot amb scikit-learn i CPU | Experiment de k-NN i SVM amb tota la mostra: descartat |
 | 18 | Paper del gradient boosting | **Decidit** | Model principal, al costat del random forest; E1 amb el millor dels dos a D2 | Només a la taula comparativa |
+| 19 | Població a cada data | **Decidit** (24-11) | Discs vistos dins de [L−7, L] amb els últims valors (`days_since_seen`). Amb «fila el dia L» un 15 % de les fallades no sortien a la franja 0–7 | Només discs amb fila el dia L |
 
 ---
 

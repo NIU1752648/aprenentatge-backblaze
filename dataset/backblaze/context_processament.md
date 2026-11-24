@@ -1,6 +1,6 @@
 # Context: processament de dades de Backblaze
 
-Estat a 22-11-2026. L'estudi de viabilitat i els resultats són a `../estudi_backblaze.md`. Aquest fitxer recull com estan processades les dades i què queda pendent.
+Estat a 24-11-2026. L'estudi de viabilitat i els resultats són a `../estudi_backblaze.md`. Aquest fitxer recull com estan processades les dades i què queda pendent.
 
 ## Objectiu del projecte
 
@@ -30,7 +30,7 @@ Estat a 22-11-2026. L'estudi de viabilitat i els resultats són a `../estudi_bac
 | `out/daily_stats.parquet`, `landmark_stats.parquet`, `failure_history.parquet`, `drive_onsets.parquet` | Sortides de `daily_stats.py` (sèries diàries, vegeu més avall) |
 | `out/figures/*.png` | Figures del notebook `notebooks/01_dades.py` |
 | `data/presence.parquet`, `data/presence_days.parquet` | Sortides de `presence.py`: un bit per disc i dia (1,4 MB) i, per dia, discs presents, esperats i caigudes generals |
-| `out/landmarks/L=<data>.parquet` | Sortida del `build.py` nou: 65 dimecres (dev 40, gap 8, test 17), 21,3 M de files, 625 MB. Resum per data a `out/build_summary.csv` |
+| `out/landmarks/L=<data>.parquet` | Sortida del `build.py` nou: 65 dimecres (dev 40, gap 8, test 17), 21,4 M de files, 600 MB. Resum per data a `out/build_summary.csv` |
 | `out/results_*.csv`, `model_log.txt`, `perm_importance_rf_t30.csv`, `cumulative_vs_km.csv` | Resultats de l'estudi amb el Q4 2025 sol |
 
 ## Flux de processament
@@ -54,9 +54,9 @@ Estat a 22-11-2026. L'estudi de viabilitat i els resultats són a `../estudi_bac
    - Comprovat: els bits quadren amb `n_days`, `first_seen` i `last_seen` de tots els discs. Només hi ha una caiguda general, el 12-5-2025 (22,3 % dels esperats; el 29 % que es deia abans comparava amb els presents). La resta de dies no passen del 0,8 %, així que el llindar del 5 % no és delicat.
 3. **`scripts/build.py <dir data> <dir sortida>`**, per exemple `build.py data out/landmarks`. Uns 4 min, una sola passada pel panel. Reescrit el 22-11-2026 (tasca #32).
    - Dates `L`: tots els dimecres del 5-2-2025 al 29-4-2026, un fitxer per data, amb `split` = `dev` (fins al 5-11-2025, 40), `gap` (8) o `test` (des del 7-1-2026, 17).
-   - Població: discs amb fila el dia L que no han fallat a L o abans.
-   - Variables: G0 (`model`, `manufacturer`, `capacity_bytes`, `age_years`), G1 (SMART 1, 7, 10, 12, 183, 184, 189, 190, 192, 193, 194, 199, 240, 241, 242 i `d30_241`, `d30_242`), G2 (SMART 5, 187, 188, 197, 198 crus), G3 (`d1_`, `d7_`, `d30_` de cada comptador d'error) i GO (`absent_30` sense dies de caiguda general, `days_since_return`, `days_since_first`, `seen_at_start`).
-   - Canvis: valor a L menys l'última fila del disc dins de [L−k−7, L−k]; NaN si no n'hi ha. A la primera data la finestra de 30 dies queda retallada a l'1-1-2025.
+   - Població (decisió 19, 24-11-2026): discs vistos dins de [L−7, L] que no han fallat a L o abans, amb els valors de la seva última fila; `days_since_seen` = dies des d'aquesta fila. S'exclouen els discs absents a L que no tornen mai sense fallar (etiquetes desconegudes a tots els horitzons). `model` i `capacity_bytes` surten de `drives.parquet`.
+   - Variables: G0 (`model`, `manufacturer`, `capacity_bytes`, `age_years`), G1 (SMART 1, 7, 10, 12, 183, 184, 189, 190, 192, 193, 194, 199, 240, 241, 242 i `d30_241`, `d30_242`), G2 (SMART 5, 187, 188, 197, 198 crus), G3 (`d1_`, `d7_`, `d30_` de cada comptador d'error) i GO (`absent_30` sense dies de caiguda general, `days_since_return`, `days_since_first`, `seen_at_start`, `days_since_seen`).
+   - Canvis: últim valor a L menys l'última fila del disc dins de [L−k−7, L−k]; NaN si no n'hi ha. A la primera data la finestra de 30 dies queda retallada a l'1-1-2025.
    - Etiquetes: `event`, `t_obs` (fins a la fallada o fins a `last_seen` de tot el període) i `y_7`, `y_30`, `y_60` (NaN si el disc surt abans de L+t sense fallar). Les franges es deriven de `t_obs` i `event`.
    - No aplica la censura de festes, ni mostreig ni imputació: es fan en llegir (tasca #34).
    - SMART 1, 7, 10, 188, 192, 193, 241 i 242 es guarden en float64 perquè passen de 2^24.
@@ -97,14 +97,28 @@ Notebook `notebooks/01_dades.py`, amb dades fins al 4-1-2026 (regla del pla, sec
 - **Soroll simulat:** amagant fins a la meitat de les fallades, el recall@1 % no es mou (0,46). La calibració relativa cau com 1 − p.
 - **Sobreajust per disc:** amb fulles de 200 files, el GB preveia 2,2 vegades les fallades en discs nous. Cal regularitzar fort (fulles de 2.000 files) i, tot i així, queda un excés del 25–30 % amb una mostra del 5 %. Per a `build.py`, cal pensar en una mostra de negatius més gran o recalibrar.
 
-**Opció triada** (pendent de confirmar per la parella):
+**Opció triada** (decidida el 24-11-2026, Vikunja #70):
 
 - Censura administrativa al **16-11-2025** per a les etiquetes de desenvolupament. Per a l'horitzó t només entren les dates amb L + t ≤ 16-11-2025, i al model per franges es censuren les franges posteriors.
 - Sense variable de calendari.
 - El test comença el 7-1-2026, amb una comprovació de sensibilitat sense les dues primeres dates.
 - Dies d'absència sense comptar els dies de caiguda general (més del 5 % del parc absent).
+- **Cap dada posterior al tall a l'entrenament.** Les etiquetes de desenvolupament es recalculen en llegir amb la informació fins al 16-11-2025: fallada si `fail_date` ≤ tall, i viu fins a L + t només si el disc té fila a L + t o després **i abans del tall** (presència), no amb el `last_seen` de tot el període que porta `t_obs`. Les llistes de models freqüents, medianes i calibratge, només amb el desenvolupament.
 
-## Resultats del `build.py` nou (22-11-2026)
+## Resultats del `build.py` nou
+
+**Versió del 24-11-2026 (població dels 7 dies anteriors), la vigent.** 5,5 min.
+
+| Bloc | Dates | Files | Positius y_7 / y_30 / y_60 | Absents el dia L |
+| --- | --- | --- | --- | --- |
+| dev | 40 | 12.837.652 | 3.438 / 15.075 / 28.977 | 8.081 |
+| gap | 8 | 2.706.352 | 347 / 1.520 / 3.693 | 5.058 |
+| test | 17 | 5.826.781 | 1.632 / 7.277 / 14.516 | 10.320 |
+
+- Ara 5.417 de les 5.714 primeres fallades (94,8 %) cauen a la franja (0, 7] d'un dimecres, contra 4.862 (85 %) abans. Les 297 que falten són discs absents més de 7 dies abans de fallar o que apareixen després del dimecres.
+- Discs exclosos per marxar sense tornar ni fallar: 4.495 files a dev i 4.369 a test.
+
+**Versió del 22-11-2026 (només discs amb fila el dia L), substituïda:**
 
 | Bloc | Dates | Files | Positius y_7 / y_30 / y_60 | Discs positius a 60 dies |
 | --- | --- | --- | --- | --- |
@@ -117,7 +131,7 @@ Notebook `notebooks/01_dades.py`, amb dades fins al 4-1-2026 (regla del pla, sec
 - El 12-5-2025 no infla `absent_30` a les dates de maig.
 - Es veu la caiguda de festes: y_60 baixa de ~800 per data a l'estiu a 403 el 5-11-2025.
 
-**Decisió oberta: població a la data L.** De les 5.714 primeres fallades entre el 5-2-2025 i el 6-5-2026, 852 (15 %) no cauen a la franja (0, 7] de cap dimecres: 832 són discs que no tenien fila el dimecres anterior (forat mitjà de 5 dies, un quart tornen el dia abans de fallar) i 20 apareixen per primera vegada després. Són precisament els discs que GO vol captar. Proposta: població = discs vistos dins de [L−7, L], amb els últims valors. Pendent de parlar-ho amb la parella abans de regenerar.
+**Per què es va canviar la població (decisió 19).** De les 5.714 primeres fallades entre el 5-2-2025 i el 6-5-2026, 852 (15 %) no cauen a la franja (0, 7] de cap dimecres: 832 són discs que no tenien fila el dimecres anterior (forat mitjà de 5 dies, un quart tornen el dia abans de fallar) i 20 apareixen per primera vegada després. Són precisament els discs que GO vol captar. Es va decidir el 24-11-2026 fer servir els discs vistos dins de [L−7, L].
 
 ## Decisió en curs: separació entre entrenament i test
 
@@ -137,10 +151,11 @@ Proposta discutida, encara no implementada:
 - [x] Descarregar i consolidar els sis trimestres (Q1 2025 – Q2 2026). Fet el 20-11-2026.
 - [x] `consolidate.py`: taula de discs agregada per trimestre i esquema unificat a `build.py`.
 - [x] Anàlisi preliminar de Nadal (1.5 bis del pla).
-- [ ] Confirmar a Vikunja la decisió de Nadal (censura al 16-11-2025).
+- [x] Decisió de Nadal confirmada (censura al 16-11-2025). 24-11-2026.
 - [x] Taula de presència (`presence.py`). Fet el 22-11-2026.
 - [x] `build.py` nou amb dates setmanals, `split`, grups G0–G3 i GO, canvis a 1, 7 i 30 dies. Fet el 22-11-2026.
-- [ ] Decidir la població a L (discs amb fila a L o vistos en els 7 dies anteriors) i, si cal, regenerar `out/landmarks`.
+- [x] Població a L: discs vistos en els 7 dies anteriors; `out/landmarks` regenerat el 24-11-2026.
+- [ ] Validació creuada de gradient boosting i logística al homelab (`cv_models.py`) i corba d'aprenentatge per a la decisió 9.
 - [ ] Partició i mostra d'entrenament (#34): censura de festes en llegir, negatius per hash de disc, pesos.
 - [ ] Adaptar `explore.py` i `model.py` al format nou (un fitxer per data).
 - [ ] Es poden esborrar els zips de `data/zip/` (7,3 GB) si cal espai: es tornen a baixar en uns 6 minuts.
