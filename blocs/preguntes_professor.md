@@ -2,17 +2,20 @@
 
 Apunteu les respostes a la tasca #41 de Vikunja.
 
-## 1. L'angle propi: de què ens podem refiar
+## 1. Model base amb els cinc comptadors d'error
 
-**Context per explicar-li (30 segons):** Backblaze decideix que un disc ha fallat, en part, mirant cinc comptadors SMART d'errors (5, 187, 188, 197 i 198). El nostre model també fa servir aquests comptadors com a variables. Per tant, un model que sembli molt bo pot estar aprenent només la regla de Backblaze, no a anticipar fallades.
+**Context per explicar-li (30 segons):** Backblaze retira proactivament discs que mostren errors de lectura i sectors defectuosos als SMART, i aquestes retirades compten com a fallades a les dades. A les nostres dades, els cinc comptadors d'error (SMART 5, 187, 188, 197 i 198) concentren la major part del senyal: un 73 % dels discs que fallen en tenen algun > 0 l'últim dia, contra un 8 % del parc. Per tant, un model que sembli molt bo pot estar aprenent la regla de retirada de Backblaze, no a anticipar fallades.
 
-**Què proposem:**
+**Pregunta:** *Ens sembla bé fer servir un model que només faci servir aquests cinc comptadors com a model base, i mesurar quant hi afegeixen la resta de variables (context del disc, altres SMART, absències)? Així podem dir quina part de la predicció és la regla i quina part és anticipació.*
 
-- **Escala de variables:** entrenem el mateix model afegint grups de variables un a un (context del disc → altres SMART → absències → comptadors d'error → canvis dels comptadors) i mirem quant guanya cada grup a cada franja de temps.
-- **Discs nets:** avaluem a part els discs amb els cinc comptadors a zero, on la regla no pot dir res.
-- **Fallades netes:** comptem quantes fallades sense cap error previ detecta el model.
+**Si pregunta d'on surt que Backblaze fa servir aquests comptadors:**
 
-**Pregunta:** *Li sembla una aportació prou bona com a centre del treball?*
+- El 2014 Backblaze va escriure que fa servir els SMART 5, 187, 188, 197 i 198 «for determining the failure or potential failure of a hard drive», i que quan el 187 passa de zero programen la substitució del disc ([Hard Drive SMART Stats](https://www.backblaze.com/blog/hard-drive-smart-stats/)).
+- El 2022 distingeixen fallades reactives (el disc no respon) i proactives (errors confirmats mirant els SMART); totes dues compten com a fallada ([Drive Stats Q2 2022](https://www.backblaze.com/blog/backblaze-drive-stats-for-q2-2022/)).
+- El 2025 diuen que el criteri principal per substituir un disc són els errors de lectura no corregibles, amb un llindar, i que una fallada és un disc amb tiquet de substitució o que desapareix de les dades ([Drive Stats Q3 2025](https://www.backblaze.com/blog/backblaze-drive-stats-for-q3-2025/)).
+- No publiquen quina part de les fallades són proactives. Per això no diem que Backblaze faci servir «principalment» aquests cinc comptadors, sinó que són els que concentren el senyal a les dades.
+
+**Complements que ja tenim previstos:** referències sense aprenentatge amb aquests comptadors (algun > 0, algun ha pujat en 7 dies, suma), avaluació a part dels discs amb els cinc comptadors a zero, i de les fallades sense cap error previ.
 
 ## 2. Festes i separació temporal entre entrenament i test
 
