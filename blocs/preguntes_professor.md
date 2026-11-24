@@ -6,7 +6,7 @@ Apunteu les respostes a la tasca #41 de Vikunja.
 
 **Context per explicar-li (30 segons):** Backblaze retira proactivament discs que mostren errors de lectura i sectors defectuosos als SMART, i aquestes retirades compten com a fallades a les dades. A les nostres dades, els cinc comptadors d'error (SMART 5, 187, 188, 197 i 198) concentren la major part del senyal: un 73 % dels discs que fallen en tenen algun > 0 l'últim dia, contra un 8 % del parc. Per tant, un model que sembli molt bo pot estar aprenent la regla de retirada de Backblaze, no a anticipar fallades.
 
-**Pregunta:** *Ens sembla bé fer servir un model que només faci servir aquests cinc comptadors com a model base, i mesurar quant hi afegeixen la resta de variables (context del disc, altres SMART, absències)? Així podem dir quina part de la predicció és la regla i quina part és anticipació.*
+**Pregunta:** *Li sembla bé que fem servir un model que només faci servir aquests cinc comptadors com a model base, i mesurar quant hi afegeixen la resta de variables (context del disc, altres SMART, absències)? Així podem dir quina part de la predicció és la regla i quina part és anticipació.*
 
 **Si pregunta d'on surt que Backblaze fa servir aquests comptadors:**
 
