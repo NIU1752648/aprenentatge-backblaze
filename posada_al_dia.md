@@ -226,6 +226,7 @@ A la presentació hi aniran la regressió logística, el random forest i el grad
 | Quins discs entren a cada dimecres (Vikunja #144) | Els vistos en els 7 dies anteriors, amb els seus últims valors. Ara un 95 % de les fallades surten a la franja de 0 a 7 dies d'algun dimecres (abans, un 85 %) |
 | Festes (Vikunja #70) | Les etiquetes de desenvolupament es tallen el 16-11-2025 i el test comença el 7-1-2026. L'entrenament no fa servir cap informació posterior al tall, ni tan sols per saber si un disc segueix viu |
 | Mètrica per triar models | Detecció amb l'1 % d'alertes. PR-AUC i ROC-AUC com a secundàries |
+| Pressupost per a l'aplicació | Dos gràfics: la corba de pressupost (quantes fallades es detecten segons quants discs avisem) i l'estalvi segons el pressupost. L'estalvi compta que cada disc avisat costa 1 i cada fallada no avisada costa ρ (5, 20 o 100 vegades més): estalvi = (ρ − 1) × fallades avisades − falses alarmes. El pressupost òptim és on l'estalvi és màxim |
 | Què vol dir «esperança» | Només la supervivència observada amb Kaplan-Meier per grups de risc, fins a 174 dies. No calculem «dies de vida» per disc, per no desviar-nos de la pregunta principal |
 
 **Encara pendents:**
@@ -234,7 +235,6 @@ A la presentació hi aniran la regressió logística, el random forest i el grad
 | --- | --- | --- |
 | Quantes dades fem servir per entrenar | Ara, 15 % dels discs sense fallada i un de cada deu dimecres | Amb la corba d'aprenentatge (`learning_curve.py`) al homelab. Entrenar amb tot és viable per al gradient boosting i la logística, però no per a k-NN i SVM |
 | Repartiment de la feina | A (dades, validació i aplicació) per a qui té el homelab; B (models i experiment central) per a l'altre | Entre nosaltres |
-| Pressupost per a l'aplicació | Corba sencera, amb el 0,1 % i l'1 % marcats | Entre nosaltres |
 | Seguiment amb el professor | Ensenyar-li l'angle propi i la definició d'esperança | A la propera classe |
 
 ## 7. Següents passos

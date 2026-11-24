@@ -469,12 +469,20 @@ L'operador revisa el parc un cop per setmana i pot actuar sobre un nombre limita
 - **Falsa alarma:** disc avisat que no falla en els 60 dies següents a l'últim avís.
 - **Classe d'urgència** (Part 0): per a cada classe, quants discs fallen dins de la seva franja. És la resposta al «quan».
 
-**Cost.** Amb C_FN el cost d'una fallada imprevista i C_FP el d'actuar sobre un disc, i ρ = C_FN / C_FP:
+**Estalvi segons el pressupost (decisió 8, 24-11-2026).** Definició exacta:
 
-- Benefici d'avisar k discs = TP · (ρ − 1) − FP.
-- **Avisar un disc surt a compte si la seva probabilitat de fallar supera 1/ρ.**
-- Amb una precisió del 8 % cal ρ > 12,5; amb l'1,4 % (horitzó de 7 dies), ρ > 72.
-- Figura: benefici segons el pressupost per a ρ = 5, 20 i 100.
+- **Unitat:** el cost d'actuar sobre un disc avisat (revisar-lo, copiar-ne les dades o substituir-lo abans d'hora) val 1. Una fallada que no s'ha avisat val ρ (incident, reconstrucció, risc de perdre dades i la substitució igualment). ρ = C_FN / C_FP; es mostren ρ = 5, 20 i 100.
+- **Què compta com a encert:** un disc avisat a la data L que falla en els 30 dies següents (y_30, la classe «programar»). La mateixa definició es pot aplicar a 7 dies.
+- **Cada setmana (data L), amb un pressupost k:** s'avisen els ⌈k · N_L⌉ discs amb més risc. TP = avisats que fallen, FP = avisats que no fallen, FN = fallades no avisades, F = TP + FN.
+  - Cost sense model (no s'avisa ningú): ρ · F.
+  - Cost amb el model: (TP + FP) · 1 + ρ · FN. Cada disc avisat costa 1, també els que fallarien, perquè la fallada avisada es converteix en una actuació planificada.
+  - **Estalvi = cost sense model − cost amb el model = (ρ − 1) · TP − FP.**
+- **Estalvi relatiu** = estalvi / ((ρ − 1) · F): la fracció de l'estalvi màxim possible, que seria avisar totes les fallades i cap disc sa. Val 0 si no s'avisa ningú, 1 en el cas perfecte i és negatiu si les falses alarmes costen més del que s'estalvia. Es calcula sumant TP, FP i F de totes les dates.
+- **Lectures que en surten:**
+  - L'estalvi és positiu mentre la **precisió acumulada** sigui més gran que 1/ρ.
+  - El pressupost **òptim** és on la precisió dels últims discs afegits (marginal) baixa a 1/ρ, que és el mateix que avisar els discs amb probabilitat calibrada > 1/ρ. Aquesta regla només funciona si les probabilitats estan ben calibrades.
+- **Figures (diapositiva d'aplicació):** (1) corba de pressupost: detecció segons k, de 0,01 % a 10 %, amb el 0,1 % i l'1 % marcats; (2) estalvi relatiu segons k per a ρ = 5, 20 i 100, amb l'òptim marcat. Mateix eix x, dos gràfics separats.
+- **Prova del 24-11-2026** (gradient boosting sense ajustar, desenvolupament, un sol grup reservat, y_30): òptim al 0,05 %, 0,36 % i 2,1 % per a ρ = 5, 20 i 100, amb un estalvi relatiu del 4 %, 24 % i 48 %. Amb un 1 % fix, ρ = 5 perd diners (−139 %). La regla p > 1/ρ avisava el doble del compte amb ρ = 20 perquè el model sobreestimava la taxa 1,6 vegades: el calibratge importa.
 - Lectura probable **[S]**: Backblaze reparteix les dades amb redundància i una fallada aïllada no perd dades, així que ρ és baixa per a «substituir» i el model serveix sobretot per a accions barates (copiar dades, programar una prova, prioritzar la revisió).
 
 ### 3.3 Calibratge
@@ -698,7 +706,7 @@ Estat a 24-11-2026 (reunió de la parella del 19-11 i decisions del 24-11). **De
 | 5 | Freqüència de dates | **Decidit** | Setmanal (dimecres), aprimant negatius | Cada 2 setmanes |
 | 6 | Variables d'absència (GO) | **Decidit** | Grup separat a l'escala de variables | No incloure-les |
 | 7 | Mètrica de selecció | **Decidit** (24-11) | Detecció amb l'1 % d'alertes per seleccionar; PR-AUC i ROC-AUC com a secundàries | PR-AUC com a principal |
-| 8 | Pressupost per a l'aplicació | **Pendent** | Proposta: corba sencera, amb 0,1 % i 1 % marcats | Només 1 % |
+| 8 | Pressupost per a l'aplicació | **Decidit** (24-11) | Dues figures: corba de pressupost (detecció del 0,01 % al 10 %, amb 0,1 % i 1 % marcats) i estalvi relatiu segons el pressupost per a ρ = 5, 20 i 100 amb l'òptim marcat. Definició de l'estalvi a §3.2 | Només l'1 % |
 | 9 | Mostreig de negatius | **Pendent** (es decideix amb la corba d'aprenentatge, `learning_curve.py` al homelab) | Proposta inicial: per disc (15 %) i una de cada deu dates. Entrenar amb tot és viable per al gradient boosting (4 min amb 12,8 M de files) i la logística, però no per a k-NN i SVM | Per fila |
 | 10 | Models a les diapositives | **Decidit** | Logística, random forest i gradient boosting; la resta en una taula | Tots set amb el mateix pes |
 | 11 | Model fora del temari | **Decidit** | Cap, tret de Kaplan-Meier per a l'esperança. SHAP és del temari (tema Explainability, afegit el 23-11-2026) i es fa servir per al gradient boosting i el random forest | — |
