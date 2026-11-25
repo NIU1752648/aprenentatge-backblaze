@@ -149,9 +149,9 @@ Les variables estan organitzades en grups, que són els passos de l'escala de va
 **1. Les festes amaguen fallades.** De Thanksgiving (17-11-2025) a Reis, es registren un 57 % menys de fallades.
 
 - Els discs es deterioren igual: els comptadors d'error continuen pujant.
-- El que passa és que a les festes hi ha menys gent i els discs **es retiren més tard**.
+- El que passa és que a les festes hi ha menys gent i **es registren menys fallades**. Després de Reis el ritme torna a pujar (nivell normal a partir del març), però les fallades que falten no apareixen més tard.
 - Per tant, les etiquetes dels dimecres que miren cap a les festes tenen fallades que «falten».
-- Proposta: tallar les etiquetes de desenvolupament el 16-11-2025, de manera que cap etiqueta miri més enllà d'aquell dia (pendent de confirmar).
+- Decisió (24-11, comprovada amb el criteri del professor el 25-11): tallar les etiquetes de desenvolupament el 16-11-2025, de manera que cap etiqueta miri més enllà d'aquell dia.
 
 **2. Una regla senzilla ja funciona força bé.** «Algun comptador d'error ha pujat» ja troba un 46 % de les fallades a 30 dies, mirant només l'1 % de discs amb més risc. El primer model de prova (gradient boosting) en troba un 52 %.
 

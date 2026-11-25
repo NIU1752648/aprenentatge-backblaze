@@ -19,7 +19,7 @@ Apunteu les respostes a la tasca #41 de Vikunja.
 
 ## 2. Festes i separació temporal entre entrenament i test
 
-**Context per explicar-li:** entre Thanksgiving i Reis es registren un 57 % menys de fallades. Els discs es deterioren igual (els comptadors d'error continuen pujant), però hi ha menys gent i els discs **es retiren més tard**. Les etiquetes que miren cap a les festes tenen fallades que falten.
+**Context per explicar-li:** entre Thanksgiving i Reis es registren un 57 % menys de fallades. Els discs es deterioren igual (els comptadors d'error continuen pujant), però hi ha menys gent i **es registren menys fallades**. Les etiquetes que miren cap a les festes tenen fallades que falten.
 
 **Què proposem:**
 
@@ -45,10 +45,19 @@ Apunteu les respostes a la tasca #41 de Vikunja.
 1. **Cap dada de l'entrenament és posterior al 16-11-2025.** Les etiquetes es tallen aquell dia: per a l'horitzó t, només entren els dimecres amb L + t ≤ 16-11-2025. Ni tan sols per saber que un disc segueix viu mirem més enllà del tall.
 2. **Cap dada del test és anterior al 8-12-2025.** El primer dimecres de test (7-1-2026) mira 30 dies enrere per calcular els canvis dels comptadors.
 3. **Entre les dues hi ha 22 dies sense cap dada compartida** (del 16-11 al 8-12-2025), i 63 dies entre l'últim dimecres d'entrenament i el primer de test, més que l'horitzó més llarg (60 dies). L'entrenament no pot haver vist cap fallada del període de test a través de les etiquetes.
-4. **El test no ha influït en cap decisió:** les festes s'han estudiat només amb dades fins al 4-1-2026, i el test s'executarà una sola vegada (4-12), amb tot congelat.
+4. **El test no ha influït en cap decisió:** la decisió de les festes es va prendre amb dades fins al 4-1-2026. Després de la classe (25-11) s'han mirat les taxes de fallada del gener–juny de 2026 per comprovar que el ritme torna a pujar (només taxes descriptives, sense cap model), i la decisió no ha canviat. El test s'executarà una sola vegada (4-12), amb tot congelat.
 5. **Per què el test no és novembre–desembre:** seria el període amb menys fallades registrades per les festes, i avaluaríem amb etiquetes incompletes.
 
 **Preguntes:**
 
 - *Li sembla bé tractar les festes tallant les etiquetes d'entrenament el 16-11?*
 - *Considera que aquesta separació és suficient perquè el test sigui realment a posteriori, o la faria més gran o d'una altra manera?*
+
+**Resposta (25-11-2026) i què n'hem fet:**
+
+- **Submostreig:** no hi ha problema. No és el seu estil, però ens dona millors resultats i el mantenim.
+- **Festes:** la caiguda només justifica tractar-les a part si després el ritme torna a pujar. Per comprovar-ho, `notebooks/01_dades.py` ara mostra les dades fins al 30-6-2026, incloent-hi el test:
+  - Les pujades de comptadors d'error no baixen en cap moment.
+  - Les fallades registrades tornen a pujar just després de Reis: 2,8 per 100.000 discs-dia la primera setmana de gener (0,4–0,8 a final de desembre), 3,2–3,3 al gener–febrer i 4,55 del març al juny, contra 4,14 abans de festes.
+  - Per tant, la caiguda va lligada a les festes i mantenim el tall al 16-11 i el split.
+  - Matís: les fallades que falten per festes no apareixen més tard (no hi ha cap excés al gener). Les dates de test de gener tenen un 20 % menys de fallades registrades; ho comprovarem traient les dues primeres dates de test i donant les mètriques per data.

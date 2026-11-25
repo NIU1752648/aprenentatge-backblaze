@@ -55,12 +55,14 @@ Versió del 20-11-2026. Document de treball per preparar les diapositives (tasqu
 - pujades de comptadors d'error, que es mantenen o pugen;
 - discs que surten sense fallar.
 
-**Números** [fet] (`01_dades.py`, dades fins al 4-1-2026):
+**Números** [fet] (`01_dades.py`, dades fins al 30-6-2026, incloent-hi el test, només taxes descriptives):
 
 - Del 17-11-2025 al 4-1-2026: **−57 %** de fallades registrades per disc respecte de les set setmanes anteriors (1,80 contra 4,14 per 100.000 discs-dia). Les dues últimes setmanes de desembre, **−90 %**.
 - En aquest mateix període, les pujades de comptadors d'error **augmenten un 10 %**, i les aparicions noves d'errors no canvien.
 - La caiguda comença la setmana de Thanksgiving, no per Nadal.
-- Dia de la setmana: es registren un **35 % menys** de fallades en diumenge i dilluns. Els comptadors no varien segons el dia.
+- **Després de festes el ritme torna a pujar:** 2,8 per 100.000 discs-dia la primera setmana de gener, 3,2–3,3 al gener–febrer i 4,55 del març al juny. Les pujades de comptadors segueixen la mateixa tendència tot el període. Per tant, la caiguda és de les festes, no una tendència (criteri del professor, 25-11).
+- Les fallades que falten per festes no apareixen després (cap excés al gener): es perden de l'etiqueta.
+- Dia de la setmana: es registren un **35 % menys** de fallades en diumenge i un **27 % menys** en dilluns. Els comptadors no varien segons el dia.
 
 **Frase per dir-ho:** «Un disc no sap quin dia és. El tècnic que el retira, sí.»
 
@@ -68,10 +70,9 @@ Versió del 20-11-2026. Document de treball per preparar les diapositives (tasqu
 
 **Pendent / decidir:**
 
-- El pla demanava la figura d'octubre de 2025 a març de 2026. Els mesos de 2026 són del període de test i no es poden mirar fins a l'execució única del test (fita D3). Fins llavors, la figura acaba el 4-1-2026.
 - Cobertura de R1 i R2 sobre el parc (`build.py` nou).
 
-**Reserva:** `dia_setmana.png`, `nadal_retard.png`.
+**Reserva:** `dia_setmana.png`, `nadal_retard.png`, `nadal_balanc.png`.
 
 ---
 
@@ -79,7 +80,7 @@ Versió del 20-11-2026. Document de treball per preparar les diapositives (tasqu
 
 **Missatge.** Avaluem com si fos el futur: test posterior en el temps, separació de 60 dies, discs separats entre entrenament i avaluació, i etiquetes de festes fora de l'entrenament.
 
-**Disseny** (pla, secció 1.5; decisió de Nadal pendent de confirmar a Vikunja, tasca 70):
+**Disseny** (pla, secció 1.5; decisió de Nadal confirmada el 24-11, Vikunja tasca 70):
 
 - Desenvolupament: dates del 5-2 al 5-11-2025. Test: del 7-1 al 29-4-2026. No es toca fins al final.
 - **Censura per festes:** per a l'horitzó t, només s'entrenen les dates amb L + t ≤ 16-11-2025. Es perden 0, 3 i 7 de les 40 dates a 7, 30 i 60 dies.
@@ -163,7 +164,8 @@ Versió del 20-11-2026. Document de treball per preparar les diapositives (tasqu
 | Figura | Respon a | Font |
 | --- | --- | --- |
 | `dia_setmana.png` | «Com sabeu que l'etiqueta és humana?» | `01_dades.py` |
-| `nadal_retard.png` | «És retard en la retirada o menys fallades?» | `01_dades.py`, N3 |
+| `nadal_retard.png` | «Per festes es deixen de declarar fallades?» Al desembre, menys discs amb errors nous consten com a fallats | `01_dades.py`, N3 |
+| `nadal_balanc.png` | «Les fallades de festes es recuperen després?» No: el ritme torna, però les que falten no apareixen | `01_dades.py`, N2 |
 | `nadal_etiquetes.png` | «Quines etiquetes toquen les festes?» | `01_dades.py`, N4 |
 | `nadal_variables.png` | «Les dates de test de gener veuen variables diferents?» | `01_dades.py`, N5 |
 | `etiqueta_festes_prevista.png` | «Quantes fallades falten a l'etiqueta?» El model n'estima un 32 % a les 7 dates afectades | `01b_etiquetes.py`, E3 |
@@ -177,5 +179,5 @@ La resta de reserves del pla (arbre dibuixat, E6, calibratge, cost segons ρ, Na
 | --- | --- |
 | Si l'etiqueta té errors, el model no els arrossega al futur? | Traiem els errors coneguts (festes) i mesurem la resta. Per ordenar discs, gairebé no afecta (E3, E4). Per a les probabilitats, sí: per això traiem les etiquetes de festes i recalibrem |
 | Què és un fals positiu aquí? | Una alerta per a un disc que no consta com a fallat en t dies. Molts són avisos anticipats: un 9 % fallen entre 30 i 90 dies després |
-| Per què les fallades cauen per Nadal? | Per festes es retiren menys discs. Els comptadors d'error no baixen. L'efecte comença per Thanksgiving |
+| Per què les fallades cauen per Nadal? | Per festes es registren menys fallades. Els comptadors d'error no baixen. L'efecte comença per Thanksgiving i el ritme torna a pujar després de Reis |
 | Què va passar el 12-5-2025? | Una fallada de la recollida de dades: un 29 % dels discs van faltar un sol dia. No es tracta com a absència real |

@@ -295,12 +295,14 @@ G  F  M  A  M  J  J  A  S  O  N  D  |  G  F  M  A  M  J
 
 **Regla per no contaminar el test.** L'anàlisi només fa servir dades fins al 4-1-2026 (l'últim dia que fan servir les etiquetes de desenvolupament). Amb sis trimestres hi ha dues mostres de Nadal: el final de Nadal de 2024 (primeres setmanes del Q1 2025) i el Nadal de 2025 sencer. Els recomptes setmanals del Q1 2026 de l'annex A es van mirar abans de fixar la partició; es deixa escrit i no es fan servir per a cap decisió més.
 
+**Excepció (25-11-2026).** El professor va demanar comprovar que el ritme de fallades torna a pujar després de festes. Un cop presa la decisió 3, `01_dades.py` mostra les taxes de fallada fins al 30-6-2026, incloent-hi el test (només taxes descriptives, sense cap model ni mètrica). El ritme torna a pujar (4,55 per 100.000 discs-dia del març al juny, contra 4,14 abans de festes) i la decisió no ha canviat. Resultats a `context_processament.md`.
+
 **Preguntes:**
 
 | | Pregunta | Com es mira | Dades |
 | --- | --- | --- | --- |
 | **N1** | Quina mida i forma té la caiguda? | Fallades per setmana i taxa per disc actiu, d'octubre de 2025 al 4-1-2026, i de gener–febrer de 2025 | `drives.parquet` |
-| **N2** | Hi ha acumulació després de festes? | Les primeres setmanes de gener de 2025 tenen més fallades que la mitjana del trimestre? | Q1 2025 |
+| **N2** | Hi ha acumulació després de festes? | Les primeres setmanes de gener de 2025 tenen més fallades que la mitjana del trimestre? Des del 25-11, també el gener de 2026 i el balanç acumulat fins al 28-6-2026 | Q1 2025 (i 2026, descriptiu) |
 | **N3** | És retard en la retirada o menys fallades reals? | Per als discs que fallen al desembre, comparats amb els d'octubre: dies absents abans de la fallada i dies entre la primera pujada d'un comptador i la fallada. Si s'allarguen al desembre, és retard en la retirada | Panel Q4 2025 |
 | **N4** | Quines etiquetes de desenvolupament toca? | Dates de referència la finestra de les quals cobreix les festes: a 60 dies, aproximadament les de finals d'octubre i novembre; a 30 dies, només les últimes. Quantes fallades «falten» respecte d'octubre | Capa 3 |
 | **N5** | Afecta les variables del primer test? | Les dates de test de gener llegeixen 30 dies de desembre. Mirar si els dies d'absència (GO) i els canvis a 30 dies tenen una distribució diferent al desembre | Panel Q4 2025 |
@@ -583,7 +585,7 @@ Els números de diapositiva són la pàgina del PDF de `../teoria/`. Les fórmul
 | Per què el gradient boosting guanya (o no) al random forest? | Boosting redueix biaix i bagging, variància. On guanya el boosting, el problema era de biaix. Si empaten, el límit és el senyal que hi ha a les dades, no el model |
 | L'early stopping no fa trampa amb el test? | No: s'atura amb un grup de discs reservat dins de l'entrenament de cada fold. El test no hi intervé, ni tampoc files del mateix disc |
 | Això no ho ha fet ja Backblaze o algú altre? | Backblaze publica estadístiques i quins SMART mira. Hi ha articles externs de predicció. El nostre angle és quant del senyal és la definició de l'etiqueta, per franges i amb pressupost, amb dades de 2025–2026 **[S]** (cal repassar la bibliografia un cop) |
-| Per què cauen les fallades al desembre? | L'etiqueta es posa quan es retira el disc, i per festes es retiren menys discs. Reforça que l'etiqueta és una decisió operativa |
+| Per què cauen les fallades al desembre? | L'etiqueta es posa quan es retira el disc, i per festes se'n registren menys. Després de Reis el ritme torna a pujar. Reforça que l'etiqueta és una decisió operativa |
 | Els discs que desapareixen de les dades, què són? | La majoria tornen (85 %). Tenen 18 vegades més risc de fallar; per això els dies d'absència són una variable |
 | Com sabeu que una diferència entre models és real? | Bootstrap per disc al test, amb diferències aparellades |
 | Què vol dir «esperança» si només mireu 60 dies? | El model només mira 60 dies i no extrapolem. L'esperança es dona per grup de risc: la supervivència observada amb Kaplan-Meier fins a 174 dies, que no suposa res |
@@ -666,7 +668,7 @@ Els scripts pesats (consolidar, construir la taula, entrenar i puntuar) continue
 | Mirar el test més d'una vegada | Mitjana | Execució única el 4 de desembre, anotada a `context_processament.md` |
 | E1 sense resultat clar | Mitjana | Qualsevol resultat respon la pregunta (taula de la Part 0) |
 | Temps de còmput | Baixa–mitjana | Cronometrar el dia 15; repartir entre dues màquines; SVM i k-NN amb submostra |
-| Efecte de Nadal a les etiquetes de desenvolupament | Baixa | Anàlisi preliminar (1.5 bis) abans de D1, només amb dades fins al 4-1-2026 |
+| Efecte de Nadal a les etiquetes de desenvolupament | Baixa | Anàlisi preliminar (1.5 bis) abans de D1, amb dades fins al 4-1-2026; comprovació del gener–juny de 2026 el 25-11 (descriptiva) |
 | Fallades en lot dominen una mètrica | Mitjana | Mètrica per data i bootstrap per disc; esmentar-ho |
 | La taxa de fallada canvia entre 2025 i 2026 | Alta | No afecta l'ordenació; el calibratge es presenta com a resultat |
 | GO resulta ser una altra fuita | Mitjana | Per això és un grup separat a l'escala |

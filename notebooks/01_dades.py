@@ -27,8 +27,12 @@ def _(mo):
     menys fallades reals (N3), quines etiquetes de desenvolupament toca (N4) i si afecta les variables
     de les primeres dates de test (N5).
 
-    **Regla per no contaminar el test:** tot el que hi ha aquí fa servir dades fins al **4-1-2026**,
-    l'últim dia que fan servir les etiquetes de desenvolupament.
+    **Període:** fins al 20-11-2026 aquest notebook només feia servir dades fins al 4-1-2026, per no
+    mirar el període de test. Després de la resposta del professor (25-11-2026, pregunta 2 de
+    `blocs/preguntes_professor.md`), es mostren **totes les dades que fem servir, fins al 30-6-2026**,
+    incloent-hi el test: una caiguda per festes només justifica el tractament si després hi ha una
+    pujada, i això només es pot veure mirant el gener–juny de 2026. Només es miren taxes
+    descriptives (cap model ni cap mètrica de test).
 
     Fonts (totes ja processades, el notebook no llegeix el panel):
 
@@ -44,7 +48,11 @@ def _(mo):
 @app.cell
 def _(Path, mo, pd):
     BASE = Path(mo.cli_args().get("data") or mo.notebook_dir().parent / "dataset" / "backblaze")
-    CUTOFF = pd.Timestamp("2026-01-04")
+    # End of the development labels; earlier versions cut every figure here
+    DEV_END = pd.Timestamp("2026-01-04")
+    # Split agreed with the professor (blocs/preguntes_professor.md, question 2)
+    TRAIN_CUT = pd.Timestamp("2025-11-16")  # training features and labels stop here
+    TEST_SPAN = (pd.Timestamp("2026-01-07"), pd.Timestamp("2026-06-28"))  # first test landmark .. last label day
     # Christmas windows (both pass through the New Year)
     XMAS = [(pd.Timestamp("2024-12-20"), pd.Timestamp("2025-01-05")),
             (pd.Timestamp("2025-12-20"), pd.Timestamp("2026-01-04"))]
@@ -61,35 +69,37 @@ def _(Path, mo, pd):
     # Development landmarks of the plan (section 1.5)
     DEV_LANDMARKS = pd.date_range("2025-02-05", "2025-11-05", freq="7D")
     HORIZONS = [7, 30, 60]
-    return BASE, CUTOFF, DEV_LANDMARKS, HORIZONS, OUTAGE, SEASON, US_HOLIDAYS, XMAS
+    return BASE, DEV_END, DEV_LANDMARKS, HORIZONS, OUTAGE, SEASON, TEST_SPAN, TRAIN_CUT, US_HOLIDAYS, XMAS
 
 
 @app.cell
-def _(BASE, CUTOFF, pd):
+def _(BASE, pd):
     drives = pd.read_parquet(BASE / "data" / "drives.parquet")
-    daily_all = pd.read_parquet(BASE / "out" / "daily_stats.parquet")
-    daily = daily_all[daily_all.date <= CUTOFF].reset_index(drop=True)
-    marks = pd.read_parquet(BASE / "out" / "landmark_stats.parquet").query("date <= @CUTOFF")
-    fails = pd.read_parquet(BASE / "out" / "failure_history.parquet").query("fail_date <= @CUTOFF")
-    onsets = pd.read_parquet(BASE / "out" / "drive_onsets.parquet").query("onset_date <= @CUTOFF")
-    return daily, daily_all, drives, fails, marks, onsets
+    daily = pd.read_parquet(BASE / "out" / "daily_stats.parquet")
+    DATA_END = daily.date.max()
+    marks = pd.read_parquet(BASE / "out" / "landmark_stats.parquet")
+    fails = pd.read_parquet(BASE / "out" / "failure_history.parquet")
+    onsets = pd.read_parquet(BASE / "out" / "drive_onsets.parquet")
+    return DATA_END, daily, drives, fails, marks, onsets
 
 
 @app.cell(hide_code=True)
-def _(daily_all, drives, mo):
+def _(daily, drives, mo):
     _n_fail = int(drives.failed.sum())
     mo.md(f"""
     ## Les dades
 
     | | |
     | --- | --- |
-    | Dies al panel | {len(daily_all)} ({daily_all.date.min():%d-%m-%Y} → {daily_all.date.max():%d-%m-%Y}) |
+    | Dies al panel | {len(daily)} ({daily.date.min():%d-%m-%Y} → {daily.date.max():%d-%m-%Y}) |
     | Discs diferents | {len(drives):,} |
     | Discs amb fallada | {_n_fail:,} |
-    | Discs actius per dia | {daily_all.n_active.min():,} – {daily_all.n_active.max():,} |
+    | Discs actius per dia | {daily.n_active.min():,} – {daily.n_active.max():,} |
     | Censura | {", ".join(f"{k}: {v:,}" for k, v in drives.censoring.value_counts().items())} |
 
-    Totes les xifres següents es limiten a dates fins al 4-1-2026.
+    Totes les figures cobreixen el període sencer. A les sèries temporals, la franja blava és el
+    període de test (primera data de referència el 7-1-2026, últim dia d'etiqueta el 28-6-2026) i la
+    línia discontínua és el tall de l'entrenament (16-11-2025).
     """)
     return
 
@@ -115,11 +125,17 @@ def _(mdates, plt):
         for h in holidays:
             ax.axvline(h, color=C["muted"], lw=0.6, ls=":", zorder=0)
 
+    def mark_split(ax, train_cut, test_span, label=True):
+        ax.axvspan(*test_span, color=C["blue"], alpha=0.06, zorder=0, lw=0,
+                   label="període de test" if label else None)
+        ax.axvline(train_cut, color=C["ink2"], lw=1, ls=(0, (4, 3)), zorder=1,
+                   label="tall de l'entrenament (16-11-2025)" if label else None)
+
     def month_axis(ax):
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%b\n%y"))
 
-    return C, month_axis, shade_holidays
+    return C, mark_split, month_axis, shade_holidays
 
 
 @app.cell(hide_code=True)
@@ -156,10 +172,10 @@ def _(daily):
 
 
 @app.cell
-def _(C, OUTAGE, SEASON, US_HOLIDAYS, XMAS, month_axis, pd, plt, shade_holidays, weekly):
+def _(C, OUTAGE, SEASON, TEST_SPAN, TRAIN_CUT, US_HOLIDAYS, XMAS, mark_split, month_axis, pd, plt, shade_holidays, weekly):
     _w = weekly.copy()
     _x = _w.week_end - pd.Timedelta(days=3)  # centre of the week
-    fig_weekly, _axes = plt.subplots(3, 1, figsize=(9, 7.2), sharex=True)
+    fig_weekly, _axes = plt.subplots(3, 1, figsize=(11, 7.6), sharex=True)
     _series = [
         ("rate_fail", "Fallades per 100.000 discs-dia", C["blue"]),
         ("rate_err_inc", "Discs amb pujada d'un comptador d'error, per 100.000 discs-dia", C["orange"]),
@@ -167,18 +183,27 @@ def _(C, OUTAGE, SEASON, US_HOLIDAYS, XMAS, month_axis, pd, plt, shade_holidays,
     ]
     for _ax, (_col, _title, _color) in zip(_axes, _series):
         shade_holidays(_ax, XMAS, US_HOLIDAYS, label=_col == "rate_fail")
+        mark_split(_ax, TRAIN_CUT, TEST_SPAN, label=_col == "rate_fail")
         _ax.plot(_x, _w[_col], color=_color, marker="o", ms=3.5)
         _part = _w.n_days < 7
         _ax.plot(_x[_part], _w[_col][_part], ls="none", marker="o", ms=6, mfc="white", mec=_color)
         _ax.set_title(_title)
         _ax.set_ylim(bottom=0)
-    _axes[0].axvline(SEASON[0], color=C["ink2"], lw=1, ls="--", label="inici de la baixada (17-11)")
-    _axes[0].legend(loc="lower left")
+    # pre-season level (29-9 - 16-11-2025): a catch-up would put January above this line
+    _pre = _w[(_x >= pd.Timestamp("2025-09-29")) & (_x < SEASON[0])]
+    _axes[0].axhline(_pre.n_fail.sum() / _pre.n_active.sum() * 1e5, color=C["blue"], lw=1, ls=":",
+                     label="nivell abans de festes (29-9 – 16-11)")
+    _axes[0].legend(loc="lower left", ncols=2, fontsize=8)
     _top = 4 * _w.rate_gone.median()
     _axes[2].set_ylim(0, _top)
     _axes[2].annotate(f"{OUTAGE:%d-%m}: caiguda de reporting\n(fora d'escala: {_w.rate_gone.max():,.0f})",
                       (OUTAGE, _top * 0.97), xytext=(8, -4), textcoords="offset points", va="top",
                       fontsize=8, color=C["ink2"])
+    _jan = _w[(_x > SEASON[1]) & (_x < pd.Timestamp("2026-02-01"))].sort_values("rate_gone").iloc[-1]
+    if _jan.rate_gone > _top:
+        _axes[2].annotate(f"setmana del {_jan.week_end:%d-%m-%Y}: {_jan.rate_gone:,.0f} (fora d'escala)",
+                          (_jan.week_end - pd.Timedelta(days=3), _top * 0.97), xytext=(8, -4),
+                          textcoords="offset points", va="top", fontsize=8, color=C["ink2"])
     _axes[-1].set_xlim(_x.min() - pd.Timedelta(days=5), _x.max() + pd.Timedelta(days=5))
     month_axis(_axes[-1])
     _axes[-1].annotate("cercles buits: setmanes incompletes · línies puntejades: festius federals dels EUA",
@@ -199,6 +224,10 @@ def _(SEASON, XMAS, pd, weekly):
             return "29-9 – 16-11-2025"
         if XMAS[0][1] < d <= pd.Timestamp("2025-03-31"):
             return "gen–mar 2025 (després de Nadal)"
+        if SEASON[1] < d <= pd.Timestamp("2026-02-01"):
+            return "gen 2026 (4 setmanes després de festes)"
+        if pd.Timestamp("2026-02-01") < d:
+            return "feb–jun 2026"
         return "resta de 2025"
 
     _w = weekly.assign(period=weekly.week_end.map(lambda e: period(e - pd.Timedelta(days=3))))
@@ -257,11 +286,19 @@ def _(C, XMAS, daily, np, plt):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## N2 · Acumulació després de festes (gener de 2025)
+    ## N2 · Acumulació després de festes
 
-    Les dades comencen l'1-1-2025, així que del Nadal de 2024 només se'n veu el final. Si la caiguda és
-    retard en la retirada, les primeres setmanes de gener haurien de tenir **més** fallades que la
-    mitjana del trimestre (els discs que no es van retirar per festes).
+    Si la caiguda és retard en la retirada, les primeres setmanes després de festes haurien de tenir
+    **més** fallades que el nivell habitual: els discs que no es van retirar per festes. El criteri
+    del professor és més feble: la caiguda només justifica tractar les festes a part si després el
+    ritme torna a pujar.
+
+    Tenim dos gèners:
+
+    - **2025:** les dades comencen l'1-1-2025, així que només se'n veu el final. Comparació amb la
+      mitjana del Q1 de 2025.
+    - **2026:** es veu sencer, ja dins del període de test. Comparació amb el nivell de les set
+      setmanes abans de festes (29-9 – 16-11-2025).
     """)
     return
 
@@ -275,6 +312,51 @@ def _(pd, weekly):
         {"rate_fail": 2, "rate_err_inc": 1, "rate_fail_vs_q1": 2}).head(8)
     n2_table
     return (n2_table,)
+
+
+@app.cell
+def _(SEASON, pd, weekly):
+    _pre = weekly[(weekly.week_end > pd.Timestamp("2025-09-28")) & (weekly.week_end < SEASON[0])]
+    PRE_RATE = _pre.n_fail.sum() / _pre.n_active.sum() * 1e5
+    _w = weekly[(weekly.week_end > SEASON[1]) & (weekly.week_end <= pd.Timestamp("2026-03-01"))]
+    n2_table_2026 = _w[["week_end", "n_days", "n_fail", "rate_fail", "rate_err_inc", "rate_gone"]].assign(
+        rate_fail_vs_pre=lambda x: x.rate_fail / PRE_RATE).round(
+        {"rate_fail": 2, "rate_err_inc": 1, "rate_gone": 1, "rate_fail_vs_pre": 2})
+    n2_table_2026
+    return PRE_RATE, n2_table_2026
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Balanç acumulat de fallades
+
+    Fallades registrades menys les esperades amb el nivell d'abans de festes, acumulades des del
+    17-11-2025. Si fos només retard, la corba baixaria durant les festes i **tornaria a pujar cap a
+    0** quan es recuperessin les retirades pendents.
+    """)
+    return
+
+
+@app.cell
+def _(C, PRE_RATE, SEASON, TEST_SPAN, TRAIN_CUT, US_HOLIDAYS, XMAS, daily, mark_split, month_axis, pd, plt, shade_holidays):
+    _d = daily[(daily.date >= SEASON[0]) & (daily.date <= TEST_SPAN[1])].set_index("date")
+    balance = ((_d.n_fail - _d.n_active * PRE_RATE / 1e5).cumsum()
+               .resample("W-SUN").last().rename("cum_excess").reset_index())
+    fig_n2, _ax = plt.subplots(figsize=(11, 3.4))
+    shade_holidays(_ax, XMAS, US_HOLIDAYS)
+    mark_split(_ax, TRAIN_CUT, TEST_SPAN, label=False)
+    _ax.axhline(0, color=C["ink2"], lw=1)
+    _ax.plot(balance.date, balance.cum_excess, color=C["blue"], marker="o", ms=3.5)
+    _end = balance[balance.date <= SEASON[1] + pd.Timedelta(days=6)].iloc[-1]
+    _ax.annotate(f"fi de festes: {_end.cum_excess:+,.0f}", (_end.date, _end.cum_excess),
+                 xytext=(8, -12), textcoords="offset points", fontsize=8, color=C["ink2"])
+    _ax.set_title("Fallades registrades menys esperades (nivell 29-9 – 16-11-2025), acumulades des del 17-11")
+    _ax.set_xlim(SEASON[0] - pd.Timedelta(days=60), TEST_SPAN[1] + pd.Timedelta(days=5))
+    month_axis(_ax)
+    fig_n2.tight_layout()
+    fig_n2
+    return balance, fig_n2
 
 
 @app.cell(hide_code=True)
@@ -322,12 +404,12 @@ def _(fails, pd, period):
 
 
 @app.cell
-def _(CUTOFF, drives, onsets, pd):
+def _(DATA_END, drives, onsets, pd):
     # Of the drives whose error counters first go up in a given week, which share
     # is recorded as failed within 14 days? Needs 14 days of follow-up before the cutoff.
     FOLLOW = 14
     _o = onsets.merge(drives[["serial_number", "fail_date"]], on="serial_number", how="left")
-    _o = _o[_o.onset_date <= CUTOFF - pd.Timedelta(days=FOLLOW)]
+    _o = _o[_o.onset_date <= DATA_END - pd.Timedelta(days=FOLLOW)]
     _o["fail_in"] = ((_o.fail_date > _o.onset_date) & (_o.fail_date <= _o.onset_date + pd.Timedelta(days=FOLLOW)))
     _o["week"] = _o.onset_date.dt.to_period("W-SUN").dt.end_time.dt.normalize()
     conv = _o.groupby("week").agg(onsets=("fail_in", "size"), fail_14=("fail_in", "sum"))
@@ -337,10 +419,11 @@ def _(CUTOFF, drives, onsets, pd):
 
 
 @app.cell
-def _(C, FOLLOW, US_HOLIDAYS, XMAS, conv, fails_ext, month_axis, np, pd, plt, shade_holidays):
-    fig_n3, _axes = plt.subplots(2, 1, figsize=(9, 5.6), sharex=True)
+def _(C, FOLLOW, TEST_SPAN, TRAIN_CUT, US_HOLIDAYS, XMAS, conv, fails_ext, mark_split, month_axis, np, pd, plt, shade_holidays):
+    fig_n3, _axes = plt.subplots(2, 1, figsize=(11, 5.8), sharex=True)
     _ax = _axes[0]
     shade_holidays(_ax, XMAS, US_HOLIDAYS)
+    mark_split(_ax, TRAIN_CUT, TEST_SPAN)
     _c = conv[conv.week > conv.week.min()]  # first week: onsets of drives already broken
     _x = _c.week - pd.Timedelta(days=3)
     _se = np.sqrt(_c.share * (1 - _c.share) / _c.onsets)
@@ -349,10 +432,12 @@ def _(C, FOLLOW, US_HOLIDAYS, XMAS, conv, fails_ext, month_axis, np, pd, plt, sh
     _ax.set_title(f"Discs amb primera pujada d'errors aquella setmana que consten com a fallada en {FOLLOW} dies")
     _ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:.0%}"))
     _ax.set_ylim(bottom=0)
+    _ax.legend(loc="lower left", fontsize=8, ncols=3)
 
     _ax = _axes[1]
     shade_holidays(_ax, XMAS, US_HOLIDAYS, label=False)
-    _f = fails_ext[fails_ext.fail_date < pd.Timestamp("2026-01-01")]
+    mark_split(_ax, TRAIN_CUT, TEST_SPAN, label=False)
+    _f = fails_ext
     _m = _f.groupby(_f.fail_date.dt.to_period("M")).agg(
         err=("err_at_fail", lambda s: (s > 0).mean()),
         abs30=("absent_30", lambda s: (s > 0).mean()),
@@ -456,9 +541,9 @@ def _(mo):
 
 
 @app.cell
-def _(C, US_HOLIDAYS, XMAS, marks, month_axis, pd, plt, shade_holidays):
+def _(C, TEST_SPAN, TRAIN_CUT, US_HOLIDAYS, XMAS, marks, mark_split, mdates, pd, plt, shade_holidays):
     _m = marks[marks.date >= marks.date.min() + pd.Timedelta(days=30)]
-    fig_n5, _axes = plt.subplots(1, 2, figsize=(10, 3.3), sharex=True)
+    fig_n5, _axes = plt.subplots(1, 2, figsize=(12, 3.4), sharex=True)
     for _ax, _cols, _title in [
         (_axes[0], [("share_absent_7", "7 dies", C["blue"]), ("share_absent_30", "30 dies", C["orange"])],
          "Discs amb algun dia absent a la finestra"),
@@ -466,13 +551,15 @@ def _(C, US_HOLIDAYS, XMAS, marks, month_axis, pd, plt, shade_holidays):
          "Discs amb alguna pujada de comptador a la finestra"),
     ]:
         shade_holidays(_ax, XMAS, US_HOLIDAYS, label=False)
+        mark_split(_ax, TRAIN_CUT, TEST_SPAN, label=False)
         for _c, _lab, _color in _cols:
             _ax.plot(_m.date, _m[_c], color=_color, marker="o", ms=3, label=_lab)
         _ax.set_title(_title)
         _ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:.1%}"))
         _ax.set_ylim(bottom=0)
         _ax.legend(loc="upper left")
-        month_axis(_ax)
+        _ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=[1, 3, 5, 7, 9, 11]))
+        _ax.xaxis.set_major_formatter(mdates.DateFormatter("%b\n%y"))
     fig_n5.tight_layout()
     fig_n5
     return (fig_n5,)
@@ -481,7 +568,55 @@ def _(C, US_HOLIDAYS, XMAS, marks, month_axis, pd, plt, shade_holidays):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Conclusions (20-11-2026, dades fins al 4-1-2026)
+    ## Revisió amb tot el període (25-11-2026, dades fins al 30-6-2026)
+
+    Criteri del professor: una caiguda per festes només justifica tractar-les a part si després el
+    ritme torna a pujar. Si no tornés, seria una tendència, no un efecte de les festes.
+
+    **El ritme torna a pujar després de festes, i els discs es deterioren al ritme de sempre.**
+
+    - **Pujades de comptadors d'error** (segon panell de la figura setmanal): no baixen en cap
+      moment de les festes, i després segueixen la mateixa tendència suau a l'alça que tenien al
+      2025. Els discs no deixen de deteriorar-se per festes.
+    - **Fallades registrades** (primer panell): cauen un 57 % del 17-11 al 4-1 (−90 % les dues
+      últimes setmanes de desembre) i tornen a pujar just després de Reis. La primera setmana de
+      gener ja n'hi ha 2,8 per 100.000 discs-dia (0,4–0,8 a final de desembre). El gener–febrer
+      queden a 3,2–3,3 (un 20 % per sota de les 4,14 d'abans de festes), i del març al juny estan
+      a 4,55, el nivell normal.
+    - Per tant, la caiguda va lligada a les festes, i el tractament que hem triat (etiquetes
+      d'entrenament tallades al 16-11-2025) i el split es mantenen. El que garanteix que el test
+      sigui a posteriori (cap dada d'entrenament posterior al 16-11, 63 dies de separació) no
+      depenia d'aquesta anàlisi.
+
+    **Matisos.**
+
+    - **Les fallades de festes no es recuperen més tard.** No hi ha cap excés al gener que les
+      compensi: al balanç acumulat en falten unes 390 al final de les festes, i el dèficit no torna
+      a 0. La pujada de l'abril–maig de 2026 arriba tres mesos després i està repartida entre
+      models antics (HGST de 12 TB, ST8000NM0055, Toshiba de 14 TB), així que no l'atribuïm a les
+      festes. En lloc de «els discs es retiren més tard», diem: **durant les festes es registren
+      menys fallades, i les etiquetes que hi miren tenen positius que falten.** La conclusió per a
+      l'entrenament és la mateixa.
+    - **Primeres dates de test.** Les etiquetes de les dates de gener miren cap al gener–febrer,
+      quan encara hi ha un 20 % menys de fallades registrades. No és cap fuita, però pot fer baixar
+      una mica les mètriques d'aquestes dates. Mantenim la prova de sensibilitat de treure les dues
+      primeres dates de test i donarem les mètriques també per data.
+    - **Sortides sense fallar.** La setmana del 5 al 11-1-2026 en surten 4.640 (unes sis vegades el
+      nivell de la tardor), i després de festes es queden més altes que abans. Hipòtesi per
+      comprovar: una part dels discs deteriorats no retirats per festes surten després sense
+      constar com a fallada.
+    - **Variables (N5).** La proporció de discs amb algun dia absent als 30 dies anteriors queda
+      entre un 1,5 % i un 2 % al test, per sobre de l'1 % de l'entrenament.
+    - **Dia de la setmana,** amb el període sencer: −35 % de fallades en diumenge, −27 % en dilluns,
+      +24 % en divendres, i les sortides sense fallar en dilluns es multipliquen per 3,5. La
+      conclusió no canvia.
+    - Aquesta anàlisi ha mirat les taxes de fallada del període de test (només taxes descriptives,
+      sense cap model ni mètrica de test). No ha canviat cap decisió.
+
+    ## Conclusions anteriors (20-11-2026, dades fins al 4-1-2026)
+
+    Es mantenen tal com es van escriure. La revisió de dalt matisa el «per tant» de N3 (les
+    fallades no es recuperen després) i completa N2 amb el gener de 2026.
 
     **N1. La caiguda és gran i comença per Thanksgiving, no per Nadal.** Del 17-11-2025 al 4-1-2026 la
     taxa de fallada és d'1,80 per 100.000 discs-dia, contra 4,14 les set setmanes anteriors (−57 %).
@@ -534,11 +669,11 @@ def _(mo):
 
 
 @app.cell
-def _(BASE, fig_dow, fig_n3, fig_n4, fig_n5, fig_weekly):
+def _(BASE, fig_dow, fig_n2, fig_n3, fig_n4, fig_n5, fig_weekly):
     # PNG copies of the figures for the slides
     _dir = BASE / "out" / "figures"
     _dir.mkdir(parents=True, exist_ok=True)
-    for _name, _fig in [("nadal_setmanal", fig_weekly), ("dia_setmana", fig_dow), ("nadal_retard", fig_n3),
+    for _name, _fig in [("nadal_setmanal", fig_weekly), ("dia_setmana", fig_dow), ("nadal_retard", fig_n3), ("nadal_balanc", fig_n2),
                         ("nadal_etiquetes", fig_n4), ("nadal_variables", fig_n5)]:
         _fig.savefig(_dir / f"{_name}.png", dpi=150, bbox_inches="tight")
     return

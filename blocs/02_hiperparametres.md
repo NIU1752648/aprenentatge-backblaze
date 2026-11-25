@@ -25,7 +25,7 @@ L'script prova totes dues. Ja hem vist a la prova ràpida que amb horitzons sepa
 
 ## Les etiquetes amb el tall de festes
 
-Les etiquetes de desenvolupament es tornen a calcular amb informació fins al 16-11-2025 (abans de les festes, quan es retiren menys discs). Fins i tot per saber si un disc segueix viu, només es mira fins al tall. Així l'entrenament no veu res del futur.
+Les etiquetes de desenvolupament es tornen a calcular amb informació fins al 16-11-2025 (abans de les festes, quan es registren menys fallades). Fins i tot per saber si un disc segueix viu, només es mira fins al tall. Així l'entrenament no veu res del futur.
 
 ## Com s'executa
 

@@ -79,11 +79,18 @@ Estat a 24-11-2026. L'estudi de viabilitat i els resultats són a `../estudi_bac
 Notebook `notebooks/01_dades.py`, amb dades fins al 4-1-2026 (regla del pla, secció 1.5 bis). Resum:
 
 - **La caiguda comença la setmana de Thanksgiving (17-11), no per Nadal.** Del 17-11-2025 al 4-1-2026, 1,80 fallades per 100.000 discs-dia contra 4,14 les set setmanes anteriors (−57 %). Les pujades de comptadors d'error augmenten un 10 % i les primeres pujades no canvien. Els discs es deterioren igual i se'n declaren menys com a fallats.
-- **És retard en la retirada:** al desembre només un 1,0 % dels discs amb primera pujada d'errors consten com a fallats en 14 dies (1,8–2,2 % de setembre a novembre). Les fallades del desembre són més evidents: més comptadors > 0 i més absències prèvies.
+- **És retard en la retirada** (matisat el 25-11: les fallades no es recuperen després; vegeu la revisió de sota): al desembre només un 1,0 % dels discs amb primera pujada d'errors consten com a fallats en 14 dies (1,8–2,2 % de setembre a novembre). Les fallades del desembre són més evidents: més comptadors > 0 i més absències prèvies.
 - **No hi ha acumulació clara al gener de 2025** (+6 % i +10 % les dues primeres setmanes senceres).
 - **Etiquetes de desenvolupament afectades:** a 7 dies cap, a 30 dies 3 dates (unes 150 fallades que falten), a 60 dies 7 dates (unes 1.000, fins a un 45 % de la taxa a la data del 5-11).
 - **Dia de la setmana:** les fallades es registren un 35 % menys en diumenge i dilluns, i les sortides sense fallar es concentren en dilluns. Les dates setmanals sempre en dimecres neutralitzen l'efecte.
 - **Caiguda de reporting el 12-5-2025:** 70.446 discs absents aquell dia (22 % dels esperats). Infla els dies d'absència de les dates de maig i juny.
+
+**Revisió amb tot el període (25-11-2026).** Resposta del professor a la pregunta 2: el submostreig està bé (no és el seu estil, però dona millors resultats). La caiguda de festes només justifica tractar-les a part si després el ritme torna a pujar. Ara `01_dades.py` mostra les dades fins al 30-6-2026, incloent-hi el test (només taxes descriptives), amb una figura nova, `out/figures/nadal_balanc.png`:
+
+- **El ritme torna a pujar, i la decisió i el split es mantenen.** Les pujades de comptadors d'error no baixen mai. Les fallades registrades tornen a pujar just després de Reis: 2,8 per 100.000 discs-dia la primera setmana de gener, 3,2–3,3 al gener–febrer i 4,55 (nivell normal) del març al juny, contra 4,14 abans de festes.
+- **Les fallades de festes no es recuperen més tard** (unes 390 que falten, sense cap excés al gener). Per això es diu «durant les festes es registren menys fallades», no «es retiren més tard». La pujada de l'abril–maig de 2026 és de models antics i no s'atribueix a les festes.
+- **Primeres dates de test:** les etiquetes de gener miren cap al gener–febrer, que té un 20 % menys de fallades registrades. Es manté la prova de sensibilitat de treure les dues primeres dates de test, i les mètriques es donaran també per data.
+- La setmana del 5 al 11-1-2026 surten 4.640 discs sense fallar (unes sis vegades el nivell de la tardor). Hipòtesi per comprovar: discs deteriorats no retirats per festes que surten sense constar com a fallada.
 
 **Mesura de l'error d'etiqueta** (`notebooks/01b_etiquetes.py`, 20-11-2026). Mostra de les 40 dates de desenvolupament amb tots els discs que fallen i un 5 % de la resta, amb pesos; es desa a `out/label_study.parquet`. Models GB i logística, validació creuada per disc, t = 30 i 60:
 
