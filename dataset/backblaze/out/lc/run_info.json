@@ -1,0 +1,278 @@
+{
+  "runs": [
+    {
+      "start": "2026-11-24T15:05:27",
+      "argv": [
+        "scripts/learning_curve.py",
+        "out/landmarks",
+        "data",
+        "out/lc",
+        "--jobs",
+        "4"
+      ],
+      "args": {
+        "landmarks_dir": "out/landmarks",
+        "data_dir": "data",
+        "out_dir": "out/lc",
+        "jobs": 4,
+        "quick": false,
+        "models": [
+          "hgb",
+          "hgb_scaled",
+          "logreg"
+        ],
+        "targets": [
+          "b_0_7",
+          "b_7_30",
+          "b_30_60",
+          "y_30"
+        ],
+        "max_fit_minutes": 30.0,
+        "max_mem_gb": 12.0,
+        "cv_module": "/home/nico/matcad/aprenentatge/projecte/dataset/backblaze/scripts/cv_models.py",
+        "report_only": false,
+        "hgb_lr": 0.1,
+        "hgb_leaves": 31,
+        "hgb_min_leaf": 2000,
+        "hgb_max_iter": null,
+        "lr_C": 0.1
+      },
+      "end": "2026-11-24T19:29:32",
+      "peak_rss_gb": 12.45
+    }
+  ],
+  "settings": {
+    "quick": false,
+    "cutoff": "2025-11-16",
+    "k_folds": 3,
+    "fold_rule": "fold = zlib.crc32(b'fold:' + serial_number.encode()) % 3",
+    "inner_rule": "GB early-stopping validation = training-sample drives with crc32('inner-validation:'+serial) % 10 == 0",
+    "sample_rule": "landmarks with date_pos % date_step == 0 for positives AND negatives; on them all positives + negatives of drives with crc32('negative-sample:'+serial)/2**32 < neg_drive_frac (cv_models.sample_training_rows with date_step=1)",
+    "hgb": {
+      "learning_rate": 0.1,
+      "max_leaf_nodes": 31,
+      "max_depth": null,
+      "min_samples_leaf": 2000,
+      "max_iter": 1000,
+      "l2_regularization": 1.0,
+      "n_iter_no_change": 15,
+      "tol": 1e-07,
+      "max_bins": 255
+    },
+    "hgb_scaled": "min_samples_leaf = 2000 * n_train / n_train(15%x1/1), >= 20",
+    "logreg": {
+      "penalty": "l2",
+      "C": 0.1
+    },
+    "budgets_pct": [
+      0.1,
+      1.0
+    ],
+    "quick_dates": null
+  },
+  "git": {
+    "commit": "6b7c1e942a925fcaecf79818a55007fd1a6fc0b1",
+    "branch": "sis-trimestres-nadal",
+    "dirty_tracked": []
+  },
+  "machine": {
+    "os": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+    "python": "3.14.4",
+    "cpu": "Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz",
+    "cpu_count": 4,
+    "ram_gb": 15.0
+  },
+  "versions": {
+    "python": "3.14.4",
+    "numpy": "2.5.4",
+    "pandas": "3.1.1",
+    "pyarrow": "26.0.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2",
+    "threadpoolctl": "3.8.0"
+  },
+  "cv_module": {
+    "path": "/home/nico/matcad/aprenentatge/projecte/dataset/backblaze/scripts/cv_models.py",
+    "sha256": "b4b0f5913952eb12423b5d1243ec126bf88d71f6f4179b81c36bc3e79145df34"
+  },
+  "seeds": {
+    "random_state": 0,
+    "hashes": "zlib.crc32 with salts fold / negative-sample / date-phase / inner-validation (cv_models.py)"
+  },
+  "grid": {
+    "neg_drive_frac": [
+      0.01,
+      0.02,
+      0.05,
+      0.15,
+      0.3,
+      0.5,
+      1.0
+    ],
+    "date_step": [
+      1,
+      3,
+      10
+    ],
+    "sizes": [
+      "1%x1/1",
+      "2%x1/1",
+      "5%x1/1",
+      "15%x1/1",
+      "30%x1/1",
+      "50%x1/1",
+      "100%x1/1",
+      "1%x1/3",
+      "2%x1/3",
+      "5%x1/3",
+      "15%x1/3",
+      "30%x1/3",
+      "50%x1/3",
+      "100%x1/3",
+      "1%x1/10",
+      "2%x1/10",
+      "5%x1/10",
+      "15%x1/10",
+      "30%x1/10",
+      "50%x1/10",
+      "100%x1/10"
+    ],
+    "corners_always_run": [
+      "15%x1/1",
+      "100%x1/1"
+    ]
+  },
+  "max_fit_minutes": 30.0,
+  "targets": [
+    "b_0_7",
+    "b_7_30",
+    "b_30_60",
+    "y_30"
+  ],
+  "models": [
+    "hgb",
+    "hgb_scaled",
+    "logreg"
+  ],
+  "selection": "recall@1% mean over folds; enough data = smallest size within one fold sd of the best",
+  "peak_rss_note": "peak_rss_gb is the process peak so far (monotone), not per fit",
+  "rows": 12837652,
+  "dates": [
+    "2025-02-05",
+    "2025-02-12",
+    "2025-02-19",
+    "2025-02-26",
+    "2025-03-05",
+    "2025-03-12",
+    "2025-03-19",
+    "2025-03-26",
+    "2025-04-02",
+    "2025-04-09",
+    "2025-04-16",
+    "2025-04-23",
+    "2025-04-30",
+    "2025-05-07",
+    "2025-05-14",
+    "2025-05-21",
+    "2025-05-28",
+    "2025-06-04",
+    "2025-06-11",
+    "2025-06-18",
+    "2025-06-25",
+    "2025-07-02",
+    "2025-07-09",
+    "2025-07-16",
+    "2025-07-23",
+    "2025-07-30",
+    "2025-08-06",
+    "2025-08-13",
+    "2025-08-20",
+    "2025-08-27",
+    "2025-09-03",
+    "2025-09-10",
+    "2025-09-17",
+    "2025-09-24",
+    "2025-10-01",
+    "2025-10-08",
+    "2025-10-15",
+    "2025-10-22",
+    "2025-10-29",
+    "2025-11-05"
+  ],
+  "target_counts": {
+    "b_0_7": {
+      "known": 12832864,
+      "pos": 3438,
+      "dates": 40
+    },
+    "b_7_30": {
+      "known": 11806433,
+      "pos": 10900,
+      "dates": 37
+    },
+    "b_30_60": {
+      "known": 10459793,
+      "pos": 12186,
+      "dates": 33
+    },
+    "y_30": {
+      "known": 11809571,
+      "pos": 14038,
+      "dates": 37
+    }
+  },
+  "features": [
+    "capacity_tb",
+    "age_years",
+    "smart_1_raw",
+    "smart_7_raw",
+    "smart_10_raw",
+    "smart_12_raw",
+    "smart_183_raw",
+    "smart_184_raw",
+    "smart_189_raw",
+    "smart_190_raw",
+    "smart_192_raw",
+    "smart_193_raw",
+    "smart_194_raw",
+    "smart_199_raw",
+    "smart_240_raw",
+    "smart_241_raw",
+    "smart_242_raw",
+    "d30_241",
+    "d30_242",
+    "absent_30",
+    "days_since_return",
+    "days_since_first",
+    "seen_at_start",
+    "days_since_seen",
+    "smart_5_raw",
+    "smart_187_raw",
+    "smart_188_raw",
+    "smart_197_raw",
+    "smart_198_raw",
+    "d1_5",
+    "d7_5",
+    "d30_5",
+    "d1_187",
+    "d7_187",
+    "d30_187",
+    "d1_188",
+    "d7_188",
+    "d30_188",
+    "d1_197",
+    "d7_197",
+    "d30_197",
+    "d1_198",
+    "d7_198",
+    "d30_198",
+    "manufacturer",
+    "model"
+  ],
+  "fold_sizes": {
+    "0": 4260537,
+    "1": 4315670,
+    "2": 4261445
+  }
+}
