@@ -16,8 +16,8 @@ What it does
 3. Folds: K = 3 by drive, fold = crc32("fold:" + serial_number) % 3 (fixed, identical for every
    model, configuration and target).
 4. Training sample, per target and training fold: all positives + every row (all dates) of the
-   negative drives with crc32("negative-sample:" + serial) / 2^32 < --neg-drive-frac (default 2 %,
-   pi ~ 2 %). Trained unweighted; probabilities corrected with p = q*pi / (q*pi + 1 - q), with
+   negative drives with crc32("negative-sample:" + serial) / 2^32 < --neg-drive-frac (default 15 %,
+   the size chosen with learning_curve.py, 24-11-2026; pi ~ 15 %). Trained unweighted; probabilities corrected with p = q*pi / (q*pi + 1 - q), with
    pi = kept negatives / negatives of the training fold. Negatives are sampled by DRIVE, never by
    date alone: keeping positives on all dates and negatives on a subset of dates leaks the label,
    because date proxies (days_since_first + seen_at_start) identify the landmark. The optional
@@ -53,15 +53,18 @@ make_hgb, fit_hgb, make_logistic, fit_model, predict_proba_rows, budget_metrics,
 
 Usage (from dataset/backblaze/):
   uv run python -I scripts/cv_models.py <landmarks dir> <data dir> <out dir>
-        [--jobs N] [--models gb,lr] [--neg-drive-frac 0.02] [--date-step 1] [--quick]
+        [--jobs N] [--models gb,lr] [--neg-drive-frac 0.15] [--date-step 1] [--quick]
 Homelab command (full grid, 8 threads):
   uv run python -I scripts/cv_models.py out/landmarks data out/cv --jobs 8
 Smoke test (3 dates, 1 config per model; use another out dir):
   uv run python -I scripts/cv_models.py out/landmarks data out/cv_quick --quick --jobs 8
-Expected runtime (8 threads, measured on an 8-thread laptop with the full development data):
-grid 180 GB fits x ~70 s (fit ~10 s, scoring ~4 M held-out rows ~55 s) + 105 logistic fits
-(L2 ~17 s, L1/saga ~90-170 s) ~ 4.5-5 h; final stage ~0.6 h; total ~5-6 h (b_0_7 reuses the y_7
-fits: same labels). The estimate printed at start uses these numbers and the log shows an ETA.
+Expected runtime with --neg-drive-frac 0.15 (fits run one after another; extrapolated from the
+learning curve on the homelab, 4 threads, and from the earlier 2 % timings): grid 180 GB fits x
+~25-40 s (fit ~10-30 s, scoring ~12 s) ~ 1.5-2 h; 75 L2 logistic fits x ~30-70 s ~ 1 h; 30 L1/saga
+fits x ~10-20 min ~ 5-10 h (saga is single-threaded and scales with the rows: the slow part);
+final stage ~1 h; total ~8-14 h (b_0_7 reuses the y_7 fits: same labels). The estimate printed at
+start is rough; the log shows an ETA from the measured times. To get GB first: --models gb, then
+--models lr on the same out dir.
 Memory: features 2.3 GB in float32 + per-chunk scoring; peak ~4-5 GB.
 """
 import argparse
@@ -103,7 +106,7 @@ SAMPLE_RULE = ("negatives: drives with crc32('negative-sample:'+serial)/2**32 < 
                "(date_pos + crc32('date-phase:'+serial) % date_step) % date_step == 0, applied to positives "
                "and negatives alike (thinning negatives only leaks the label through date proxies)")
 INNER_RULE = "GB early-stopping validation = training-sample drives with crc32('inner-validation:'+serial) % 10 == 0"
-DEFAULT_NEG_DRIVE_FRAC = 0.02
+DEFAULT_NEG_DRIVE_FRAC = 0.15   # size chosen with learning_curve.py (out/lc, 24-11-2026)
 DEFAULT_DATE_STEP = 1
 
 HORIZONS = (7, 30, 60)
@@ -146,9 +149,9 @@ GB_FIXED = {"max_iter": 1000, "l2_regularization": 1.0, "n_iter_no_change": 15, 
 LR_MAX_ITER = 3000
 MIN_MODEL_DRIVES = 500        # frequent model: >= 500 distinct drives in the training fold
 MAX_MODEL_LEVELS = 60
-# Seconds per fit (fit + scoring of one held-out fold) measured on the full development data with
-# 8 threads on the development laptop; used only for the estimate printed at start.
-EST_SECONDS = {"gb": 70.0, "lr": 50.0}   # lr: mean of L2 (~17 s) and L1/saga (~130 s)
+# Seconds per fit (fit + scoring of one held-out fold) at --neg-drive-frac 0.15, extrapolated from
+# the learning curve (homelab, 4 threads); used only for the estimate printed at start.
+EST_SECONDS = {"gb": 35.0, "lr": 290.0}   # lr: mean of 5 L2 (~45 s) and 2 L1/saga (~15 min)
 
 
 def day_index(d):
