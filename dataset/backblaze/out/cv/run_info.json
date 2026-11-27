@@ -1,0 +1,416 @@
+{
+  "runs": [
+    {
+      "start": "2026-11-25T12:47:36",
+      "argv": [
+        "scripts/cv_models.py",
+        "out/landmarks",
+        "data",
+        "out/cv",
+        "--jobs",
+        "4"
+      ],
+      "args": {
+        "landmarks_dir": "out/landmarks",
+        "data_dir": "data",
+        "out_dir": "out/cv",
+        "jobs": 4,
+        "models": "gb,lr",
+        "neg_drive_frac": 0.15,
+        "date_step": 1,
+        "quick": false
+      },
+      "end": "2026-11-25T17:07:36",
+      "peak_rss_gb": 6.48
+    }
+  ],
+  "settings": {
+    "quick": false,
+    "neg_drive_frac": 0.15,
+    "date_step": 1,
+    "cutoff": "2025-11-16",
+    "k_folds": 3,
+    "fold_rule": "fold = zlib.crc32(b'fold:' + serial_number.encode()) % 3",
+    "seed": 0
+  },
+  "git": {
+    "commit": "c88a5608d588bbdaf4556b3433c0a41cbf98dbed",
+    "dirty": false
+  },
+  "versions": {
+    "python": "3.14.4",
+    "numpy": "2.5.4",
+    "pandas": "3.1.1",
+    "pyarrow": "26.0.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "threadpoolctl": "3.8.0"
+  },
+  "machine": {
+    "os": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+    "machine": "x86_64",
+    "cpu_count": 4,
+    "ram_gb": 15.0
+  },
+  "seeds": {
+    "random_state": 0,
+    "hashes": "zlib.crc32 with salts fold / negative-sample / date-phase / inner-validation"
+  },
+  "sample_rule": "negatives: drives with crc32('negative-sample:'+serial)/2**32 < neg_drive_frac, all their dates; all positives kept. Optional date thinning (date_step > 1): rows with (date_pos + crc32('date-phase:'+serial) % date_step) % date_step == 0, applied to positives and negatives alike (thinning negatives only leaks the label through date proxies)",
+  "inner_validation_rule": "GB early-stopping validation = training-sample drives with crc32('inner-validation:'+serial) % 10 == 0",
+  "budgets_pct": [
+    0.01,
+    0.1,
+    0.5,
+    1.0,
+    2.0,
+    5.0,
+    10.0
+  ],
+  "selection": "recall@1% mean over folds; one-SD rule (simplest config with mean >= best mean - best fold sd)",
+  "targets": {
+    "y_7": [
+      "a",
+      0,
+      7
+    ],
+    "y_30": [
+      "a",
+      0,
+      30
+    ],
+    "y_60": [
+      "a",
+      0,
+      60
+    ],
+    "b_0_7": [
+      "b1",
+      0,
+      7
+    ],
+    "b_7_30": [
+      "b1",
+      7,
+      30
+    ],
+    "b_30_60": [
+      "b1",
+      30,
+      60
+    ]
+  },
+  "feature_groups": {
+    "G0": [
+      "manufacturer",
+      "model",
+      "capacity_tb",
+      "age_years"
+    ],
+    "G1": [
+      "smart_1_raw",
+      "smart_7_raw",
+      "smart_10_raw",
+      "smart_12_raw",
+      "smart_183_raw",
+      "smart_184_raw",
+      "smart_189_raw",
+      "smart_190_raw",
+      "smart_192_raw",
+      "smart_193_raw",
+      "smart_194_raw",
+      "smart_199_raw",
+      "smart_240_raw",
+      "smart_241_raw",
+      "smart_242_raw",
+      "d30_241",
+      "d30_242"
+    ],
+    "GO": [
+      "absent_30",
+      "days_since_return",
+      "days_since_first",
+      "seen_at_start",
+      "days_since_seen"
+    ],
+    "G2": [
+      "smart_5_raw",
+      "smart_187_raw",
+      "smart_188_raw",
+      "smart_197_raw",
+      "smart_198_raw"
+    ],
+    "G3": [
+      "d1_5",
+      "d7_5",
+      "d30_5",
+      "d1_187",
+      "d7_187",
+      "d30_187",
+      "d1_188",
+      "d7_188",
+      "d30_188",
+      "d1_197",
+      "d7_197",
+      "d30_197",
+      "d1_198",
+      "d7_198",
+      "d30_198"
+    ]
+  },
+  "grids": {
+    "gb": [
+      {
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "min_samples_leaf": 500
+      },
+      {
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "min_samples_leaf": 2000
+      },
+      {
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "min_samples_leaf": 5000
+      },
+      {
+        "learning_rate": 0.05,
+        "max_depth": 5,
+        "min_samples_leaf": 500
+      },
+      {
+        "learning_rate": 0.05,
+        "max_depth": 5,
+        "min_samples_leaf": 2000
+      },
+      {
+        "learning_rate": 0.05,
+        "max_depth": 5,
+        "min_samples_leaf": 5000
+      },
+      {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "min_samples_leaf": 500
+      },
+      {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "min_samples_leaf": 2000
+      },
+      {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "min_samples_leaf": 5000
+      },
+      {
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "min_samples_leaf": 500
+      },
+      {
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "min_samples_leaf": 2000
+      },
+      {
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "min_samples_leaf": 5000
+      }
+    ],
+    "lr": [
+      {
+        "penalty": "l2",
+        "C": 0.001
+      },
+      {
+        "penalty": "l2",
+        "C": 0.01
+      },
+      {
+        "penalty": "l2",
+        "C": 0.1
+      },
+      {
+        "penalty": "l2",
+        "C": 1.0
+      },
+      {
+        "penalty": "l2",
+        "C": 10.0
+      },
+      {
+        "penalty": "l1",
+        "C": 0.01
+      },
+      {
+        "penalty": "l1",
+        "C": 0.1
+      }
+    ]
+  },
+  "gb_fixed": {
+    "max_iter": 1000,
+    "l2_regularization": 1.0,
+    "n_iter_no_change": 15,
+    "tol": 1e-07,
+    "max_bins": 255
+  },
+  "lr_max_iter": 3000,
+  "frequent_models": ">= 500 drives in the training fold, at most 60",
+  "label_differences": {
+    "y_7": {
+      "rows_out_of_scope_L+t>cutoff": 0,
+      "rows_in_scope": 12837652,
+      "stored_vs_strict": {
+        "0->0": 12829426,
+        "0->1": 0,
+        "0->nan": 338,
+        "1->0": 0,
+        "1->1": 3438,
+        "1->nan": 0,
+        "nan->0": 0,
+        "nan->1": 0,
+        "nan->nan": 4450
+      },
+      "differ": 338
+    },
+    "y_30": {
+      "rows_out_of_scope_L+t>cutoff": 1008236,
+      "rows_in_scope": 11829416,
+      "stored_vs_strict": {
+        "0->0": 11795533,
+        "0->1": 0,
+        "0->nan": 434,
+        "1->0": 0,
+        "1->1": 14038,
+        "1->nan": 0,
+        "nan->0": 0,
+        "nan->1": 0,
+        "nan->nan": 19411
+      },
+      "differ": 434
+    },
+    "y_60": {
+      "rows_out_of_scope_L+t>cutoff": 2335040,
+      "rows_in_scope": 10502612,
+      "stored_vs_strict": {
+        "0->0": 10447607,
+        "0->1": 0,
+        "0->nan": 633,
+        "1->0": 0,
+        "1->1": 24569,
+        "1->nan": 0,
+        "nan->0": 0,
+        "nan->1": 0,
+        "nan->nan": 29803
+      },
+      "differ": 633
+    }
+  },
+  "target_counts": {
+    "y_7": {
+      "known": 12832864,
+      "pos": 3438,
+      "dates": 40
+    },
+    "y_30": {
+      "known": 11809571,
+      "pos": 14038,
+      "dates": 37
+    },
+    "y_60": {
+      "known": 10472176,
+      "pos": 24569,
+      "dates": 33
+    },
+    "b_0_7": {
+      "known": 12832864,
+      "pos": 3438,
+      "dates": 40
+    },
+    "b_7_30": {
+      "known": 11806433,
+      "pos": 10900,
+      "dates": 37
+    },
+    "b_30_60": {
+      "known": 10459793,
+      "pos": 12186,
+      "dates": 33
+    }
+  },
+  "rows": 12837652,
+  "dates": [
+    "2025-02-05",
+    "2025-02-12",
+    "2025-02-19",
+    "2025-02-26",
+    "2025-03-05",
+    "2025-03-12",
+    "2025-03-19",
+    "2025-03-26",
+    "2025-04-02",
+    "2025-04-09",
+    "2025-04-16",
+    "2025-04-23",
+    "2025-04-30",
+    "2025-05-07",
+    "2025-05-14",
+    "2025-05-21",
+    "2025-05-28",
+    "2025-06-04",
+    "2025-06-11",
+    "2025-06-18",
+    "2025-06-25",
+    "2025-07-02",
+    "2025-07-09",
+    "2025-07-16",
+    "2025-07-23",
+    "2025-07-30",
+    "2025-08-06",
+    "2025-08-13",
+    "2025-08-20",
+    "2025-08-27",
+    "2025-09-03",
+    "2025-09-10",
+    "2025-09-17",
+    "2025-09-24",
+    "2025-10-01",
+    "2025-10-08",
+    "2025-10-15",
+    "2025-10-22",
+    "2025-10-29",
+    "2025-11-05"
+  ],
+  "fold_sizes": {
+    "0": 4260537,
+    "1": 4315670,
+    "2": 4261445
+  },
+  "e4_monotonicity": {
+    "gb_a": {
+      "share_rows_decreasing": 0.03433353700505357,
+      "share_drives_decreasing": 0.14538833332850098,
+      "rows": 12837652
+    },
+    "gb_b1": {
+      "share_rows_decreasing": 0.0,
+      "share_drives_decreasing": 0.0,
+      "rows": 12837652
+    },
+    "lr_a": {
+      "share_rows_decreasing": 0.014345458188148424,
+      "share_drives_decreasing": 0.03786347808186212,
+      "rows": 12837652
+    },
+    "lr_b1": {
+      "share_rows_decreasing": 2.726355255618395e-06,
+      "share_drives_decreasing": 1.1597665389957001e-05,
+      "rows": 12837652
+    }
+  }
+}

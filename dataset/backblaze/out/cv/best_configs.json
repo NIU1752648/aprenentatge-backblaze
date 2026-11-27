@@ -1,0 +1,299 @@
+{
+  "selection": "recall@1% mean over folds; one-SD rule (simplest config with mean >= best mean - best fold sd)",
+  "neg_drive_frac": 0.15,
+  "date_step": 1,
+  "choices": {
+    "gb": {
+      "y_7": {
+        "best": {
+          "config_id": "gb_lr0.05_d5_m2000",
+          "params": {
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_samples_leaf": 2000
+          },
+          "recall@1%": 0.6507591331259485,
+          "recall@1%_sd": 0.009828615283830718,
+          "mean_n_iter": 169.33333333333334
+        },
+        "one_sd": {
+          "config_id": "gb_lr0.05_d3_m500",
+          "params": {
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_samples_leaf": 500
+          },
+          "recall@1%": 0.644658252279121,
+          "mean_n_iter": 334.6666666666667
+        },
+        "threshold": 0.6409305178421177,
+        "n_candidates": 5
+      },
+      "y_30": {
+        "best": {
+          "config_id": "gb_lr0.05_d5_m500",
+          "params": {
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_samples_leaf": 500
+          },
+          "recall@1%": 0.5459127527475082,
+          "recall@1%_sd": 0.009576322611501695,
+          "mean_n_iter": 214.66666666666666
+        },
+        "one_sd": {
+          "config_id": "gb_lr0.1_d3_m5000",
+          "params": {
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_samples_leaf": 5000
+          },
+          "recall@1%": 0.5409569232920023,
+          "mean_n_iter": 203.33333333333334
+        },
+        "threshold": 0.5363364301360065,
+        "n_candidates": 10
+      },
+      "y_60": {
+        "best": {
+          "config_id": "gb_lr0.05_d5_m500",
+          "params": {
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_samples_leaf": 500
+          },
+          "recall@1%": 0.4844153450030518,
+          "recall@1%_sd": 0.013244755910238054,
+          "mean_n_iter": 219.33333333333334
+        },
+        "one_sd": {
+          "config_id": "gb_lr0.1_d3_m5000",
+          "params": {
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_samples_leaf": 5000
+          },
+          "recall@1%": 0.4801009322875876,
+          "mean_n_iter": 365.6666666666667
+        },
+        "threshold": 0.47117058909281373,
+        "n_candidates": 12
+      },
+      "b_0_7": {
+        "best": {
+          "config_id": "gb_lr0.05_d5_m2000",
+          "params": {
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_samples_leaf": 2000
+          },
+          "recall@1%": 0.6507591331259485,
+          "recall@1%_sd": 0.009828615283830718,
+          "mean_n_iter": 169.33333333333334
+        },
+        "one_sd": {
+          "config_id": "gb_lr0.05_d3_m500",
+          "params": {
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_samples_leaf": 500
+          },
+          "recall@1%": 0.644658252279121,
+          "mean_n_iter": 334.6666666666667
+        },
+        "threshold": 0.6409305178421177,
+        "n_candidates": 5
+      },
+      "b_7_30": {
+        "best": {
+          "config_id": "gb_lr0.05_d5_m2000",
+          "params": {
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_samples_leaf": 2000
+          },
+          "recall@1%": 0.5258342775595942,
+          "recall@1%_sd": 0.011044122260357501,
+          "mean_n_iter": 194.66666666666666
+        },
+        "one_sd": {
+          "config_id": "gb_lr0.1_d3_m500",
+          "params": {
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_samples_leaf": 500
+          },
+          "recall@1%": 0.5161037020309233,
+          "mean_n_iter": 266.6666666666667
+        },
+        "threshold": 0.5147901552992368,
+        "n_candidates": 7
+      },
+      "b_30_60": {
+        "best": {
+          "config_id": "gb_lr0.1_d5_m5000",
+          "params": {
+            "learning_rate": 0.1,
+            "max_depth": 5,
+            "min_samples_leaf": 5000
+          },
+          "recall@1%": 0.424178619507666,
+          "recall@1%_sd": 0.0027725605682117323,
+          "mean_n_iter": 172.66666666666666
+        },
+        "one_sd": {
+          "config_id": "gb_lr0.1_d3_m2000",
+          "params": {
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_samples_leaf": 2000
+          },
+          "recall@1%": 0.42230343566825174,
+          "mean_n_iter": 246.66666666666666
+        },
+        "threshold": 0.42140605893945426,
+        "n_candidates": 4
+      }
+    },
+    "lr": {
+      "y_7": {
+        "best": {
+          "config_id": "lr_l2_C10.0",
+          "params": {
+            "C": 10.0,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.5867198774768833,
+          "recall@1%_sd": 0.009059712262247445,
+          "mean_n_iter": 76.0
+        },
+        "one_sd": {
+          "config_id": "lr_l2_C0.01",
+          "params": {
+            "C": 0.01,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.5815341496894505,
+          "mean_n_iter": 97.0
+        },
+        "threshold": 0.5776601652146358,
+        "n_candidates": 4
+      },
+      "y_30": {
+        "best": {
+          "config_id": "lr_l2_C0.01",
+          "params": {
+            "C": 0.01,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.49569783597867284,
+          "recall@1%_sd": 0.010757501136432304,
+          "mean_n_iter": 97.33333333333333
+        },
+        "one_sd": {
+          "config_id": "lr_l2_C0.01",
+          "params": {
+            "C": 0.01,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.49569783597867284,
+          "mean_n_iter": 97.33333333333333
+        },
+        "threshold": 0.48494033484224053,
+        "n_candidates": 4
+      },
+      "y_60": {
+        "best": {
+          "config_id": "lr_l2_C0.01",
+          "params": {
+            "C": 0.01,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.4358149460234427,
+          "recall@1%_sd": 0.006495855916836709,
+          "mean_n_iter": 95.0
+        },
+        "one_sd": {
+          "config_id": "lr_l2_C0.001",
+          "params": {
+            "C": 0.001,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.4309072625792845,
+          "mean_n_iter": 50.0
+        },
+        "threshold": 0.42931909010660596,
+        "n_candidates": 5
+      },
+      "b_0_7": {
+        "best": {
+          "config_id": "lr_l2_C10.0",
+          "params": {
+            "C": 10.0,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.5867198774768833,
+          "recall@1%_sd": 0.009059712262247445,
+          "mean_n_iter": 76.0
+        },
+        "one_sd": {
+          "config_id": "lr_l2_C0.01",
+          "params": {
+            "C": 0.01,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.5815341496894505,
+          "mean_n_iter": 97.0
+        },
+        "threshold": 0.5776601652146358,
+        "n_candidates": 4
+      },
+      "b_7_30": {
+        "best": {
+          "config_id": "lr_l2_C0.01",
+          "params": {
+            "C": 0.01,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.46852004625582705,
+          "recall@1%_sd": 0.009237727174060819,
+          "mean_n_iter": 106.66666666666667
+        },
+        "one_sd": {
+          "config_id": "lr_l2_C0.01",
+          "params": {
+            "C": 0.01,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.46852004625582705,
+          "mean_n_iter": 106.66666666666667
+        },
+        "threshold": 0.45928231908176625,
+        "n_candidates": 4
+      },
+      "b_30_60": {
+        "best": {
+          "config_id": "lr_l2_C0.01",
+          "params": {
+            "C": 0.01,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.37647629988144465,
+          "recall@1%_sd": 0.0030125771558794727,
+          "mean_n_iter": 113.33333333333333
+        },
+        "one_sd": {
+          "config_id": "lr_l2_C0.01",
+          "params": {
+            "C": 0.01,
+            "penalty": "l2"
+          },
+          "recall@1%": 0.37647629988144465,
+          "mean_n_iter": 113.33333333333333
+        },
+        "threshold": 0.37346372272556516,
+        "n_candidates": 3
+      }
+    }
+  }
+}
